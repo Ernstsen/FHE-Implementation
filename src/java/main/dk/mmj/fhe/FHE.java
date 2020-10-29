@@ -1,6 +1,6 @@
 package dk.mmj.fhe;
 
-import org.bouncycastle.pqc.math.linearalgebra.Matrix;
+import org.ejml.simple.SimpleMatrix;
 
 import java.util.Objects;
 
@@ -24,7 +24,7 @@ public interface FHE {
      * @param publicKey the secret key to encrypt m under
      * @return encryption of m under publicKey
      */
-    Ciphertext encrypt(boolean m, Matrix publicKey);
+    Ciphertext encrypt(boolean m, SimpleMatrix publicKey);
 
     /**
      * Decrypts a message encrypted under the publicKey, related to the given secretKey
@@ -33,20 +33,20 @@ public interface FHE {
      * @param secretKey the secret key, relating to the public key used for encryption
      * @return the plaintext value x where c = ENC(x)
      */
-    boolean decrypt(Ciphertext c, Matrix secretKey);
+    boolean decrypt(Ciphertext c, SimpleMatrix secretKey);
 
     /**
      * Keypair for the fully homomorphic encryption scheme
      */
     class KeyPair {
-        private Matrix secretKey;
-        private Matrix publicKey;
+        private SimpleMatrix secretKey;
+        private SimpleMatrix publicKey;
 
-        public Matrix getSecretKey() {
+        public SimpleMatrix getSecretKey() {
             return secretKey;
         }
 
-        public Matrix getPublicKey() {
+        public SimpleMatrix getPublicKey() {
             return publicKey;
         }
 
