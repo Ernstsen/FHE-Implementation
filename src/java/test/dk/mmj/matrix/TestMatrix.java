@@ -12,6 +12,8 @@ import static org.junit.Assert.assertNotEquals;
 
 public class TestMatrix {
 
+    public static final BigInteger MODULO = new BigInteger("1000000");
+
     @Test
     public void testMatrixSize() {
 
@@ -76,29 +78,90 @@ public class TestMatrix {
     }
 
     @Test
+    public void testAddRow() {
+        BigInteger[][] inner = {
+                {valueOf(1), valueOf(4), valueOf(5)},
+                {valueOf(-5), valueOf(8), valueOf(9)},
+        };
+        Matrix matrix = new Matrix(inner);
+
+        BigInteger[][] expectedInner = {
+                {valueOf(1), valueOf(4), valueOf(5)},
+                {valueOf(-5), valueOf(8), valueOf(9)},
+                {valueOf(4), valueOf(8), valueOf(9)}
+        };
+        Matrix expected = new Matrix(expectedInner);
+
+        BigInteger[] newRow = {valueOf(4), valueOf(8), valueOf(9)};
+        Matrix res = matrix.addRow(newRow);
+
+        assertEquals("Adding row had unexpected result",
+                expected,
+                res);
+    }
+
+    @Test
+    public void testAddColumn() {
+        BigInteger[][] inner = {
+                {valueOf(1), valueOf(4), valueOf(5)},
+                {valueOf(-5), valueOf(8), valueOf(9)},
+        };
+        Matrix matrix = new Matrix(inner);
+
+        BigInteger[][] expectedInner = {
+                {valueOf(1), valueOf(4), valueOf(5), valueOf(4)},
+                {valueOf(-5), valueOf(8), valueOf(9), valueOf(89)},
+        };
+        Matrix expected = new Matrix(expectedInner);
+
+        BigInteger[] newColumn = {valueOf(4), valueOf(89)};
+        Matrix res = matrix.addColumn(newColumn);
+
+        assertEquals("Adding row had unexpected result", expected, res);
+    }
+
+    @Test
+    public void testNegate() {
+        BigInteger[][] inner = {
+                {valueOf(1), valueOf(4), valueOf(5)},
+                {valueOf(-5), valueOf(8), valueOf(9)},
+        };
+        Matrix matrix = new Matrix(inner);
+        Matrix res = matrix.negate();
+
+
+        for (int row = 0; row < matrix.getRows(); row++) {
+            for (int col = 0; col < matrix.getColumns(); col++) {
+                assertEquals("Value was not negated. row=" + row + ", column=" + col,
+                        matrix.get(row, col).negate(), res.get(row, col));
+            }
+        }
+    }
+
+    @Test
     public void testMatrixMultiplication() {
         BigInteger[][] innerA = {
-                new BigInteger[]{valueOf(8), valueOf(6)},
-                new BigInteger[]{valueOf(86), valueOf(2)},
-                new BigInteger[]{valueOf(9), valueOf(65)},
-                new BigInteger[]{valueOf(2), valueOf(3)}
+                {valueOf(8), valueOf(6)},
+                {valueOf(86), valueOf(2)},
+                {valueOf(9), valueOf(65)},
+                {valueOf(2), valueOf(3)}
         };
         BigInteger[][] innerB = {
-                new BigInteger[]{valueOf(1), valueOf(4), valueOf(5)},
-                new BigInteger[]{valueOf(-5), valueOf(8), valueOf(9)},
+                {valueOf(1), valueOf(4), valueOf(5)},
+                {valueOf(-5), valueOf(8), valueOf(9)},
         };
         BigInteger[][] innerC = {
-                new BigInteger[]{valueOf(-22), valueOf(80), valueOf(94)},
-                new BigInteger[]{valueOf(76), valueOf(360), valueOf(448)},
-                new BigInteger[]{valueOf(-316), valueOf(556), valueOf(630)},
-                new BigInteger[]{valueOf(-13), valueOf(32), valueOf(37)}
+                {valueOf(-22).mod(MODULO), valueOf(80), valueOf(94)},
+                {valueOf(76), valueOf(360), valueOf(448)},
+                {valueOf(-316).mod(MODULO), valueOf(556), valueOf(630)},
+                {valueOf(-13).mod(MODULO), valueOf(32), valueOf(37)}
         };
 
         Matrix b = new Matrix(innerB);
         Matrix a = new Matrix(innerA);
         Matrix c = new Matrix(innerC);
 
-        Matrix product = a.multiply(b);
+        Matrix product = a.multiply(b, MODULO);
 
         assertEquals("Matrix multiplication went wrong", c, product);
     }
@@ -106,25 +169,66 @@ public class TestMatrix {
     @Test
     public void testMatrixAdd() {
         BigInteger[][] innerA = {
-                new BigInteger[]{valueOf(1), valueOf(4), valueOf(5)},
-                new BigInteger[]{valueOf(-5), valueOf(8), valueOf(9)},
+                {valueOf(1), valueOf(4), valueOf(5)},
+                {valueOf(-5), valueOf(8), valueOf(9)},
         };
         BigInteger[][] innerB = {
-                new BigInteger[]{valueOf(8), valueOf(5), valueOf(9)},
-                new BigInteger[]{valueOf(4), valueOf(21), valueOf(5)},
+                {valueOf(8), valueOf(5), valueOf(9)},
+                {valueOf(4), valueOf(21), valueOf(5)},
         };
         BigInteger[][] innerC = {
-                new BigInteger[]{valueOf(9), valueOf(9), valueOf(14)},
-                new BigInteger[]{valueOf(-1), valueOf(29), valueOf(14)}
+                {valueOf(9), valueOf(9), valueOf(14)},
+                {MODULO.add(valueOf(1).negate()), valueOf(29), valueOf(14)}
         };
 
         Matrix a = new Matrix(innerA);
         Matrix b = new Matrix(innerB);
         Matrix c = new Matrix(innerC);
 
-        Matrix sum = a.add(b);
+        Matrix sum = a.add(b, MODULO);
 
         assertEquals("Matrix addition went wrong", c, sum);
+    }
+
+    @Test
+    public void testMatrixAddModulo() {
+        BigInteger[][] innerA = {
+                {valueOf(1), valueOf(4)},
+                {valueOf(5), valueOf(8)},
+        };
+
+        BigInteger[][] innerC = {
+                {valueOf(2), valueOf(8)},
+                {valueOf(0), valueOf(6)}
+        };
+
+        Matrix a = new Matrix(innerA);
+        Matrix c = new Matrix(innerC);
+
+        Matrix sum = a.add(a, valueOf(10));
+
+        assertEquals("Matrix addition went wrong, using modulo", c, sum);
+    }
+
+
+    @Test
+    public void testMatrixMultiplicationModulo() {
+        BigInteger[][] innerA = {
+                {valueOf(2), valueOf(4)},
+                {valueOf(8), valueOf(9)},
+        };
+
+        BigInteger[][] innerC = {
+                {valueOf(6), valueOf(4)},
+                {valueOf(8), valueOf(3)}
+        };
+
+        Matrix a = new Matrix(innerA);
+        Matrix c = new Matrix(innerC);
+
+        Matrix sum = a.multiply(a, valueOf(10));
+
+        assertEquals("Matrix multiplication went wrong, using modulo", c, sum);
     }
 
 }

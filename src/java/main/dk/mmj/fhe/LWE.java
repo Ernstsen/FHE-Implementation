@@ -30,17 +30,20 @@ public class LWE implements FHE {
         BigInteger q = new BigInteger(securityParameter, rand);
         int n = securityParameter / 2;
         int m = n * nFactorToM;
+
         Matrix bigB = new Matrix(n, m, rand, q);
 
         Matrix t = new Matrix(1, n, rand, q);
 
         Matrix e = new Matrix(1, m, rand, BigInteger.valueOf(n));
 
-        Matrix b = t.multiply(bigB).add(e);
+        Matrix b = t.multiply(bigB, q).add(e, q);
 
+        Matrix minusT = t.negate().addColumn(new BigInteger[]{BigInteger.ONE});
+        Matrix bigA = bigB.addRow(b.asVector());
         return new KeyPair(
-                new LWESecretKey(t),
-                new LWEPublicKey(b)
+                new LWESecretKey(minusT),
+                new LWEPublicKey(bigA, q)
         );
     }
 

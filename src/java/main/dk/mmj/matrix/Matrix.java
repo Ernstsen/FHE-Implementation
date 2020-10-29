@@ -72,8 +72,37 @@ public class Matrix {
         return inner[row][column];
     }
 
+    /**
+     * If the matrix has either one row, or one column, this method will return said row/column as an array
+     *
+     * @return the matrix as a vector
+     */
+    public BigInteger[] asVector() {
+        if (nrOfRows != 1 && nrOfCols != 1) {
+            throw new MalformedMatrixException("Matrix is not a vector");
+        }
+
+        if (nrOfRows == 1) {
+            return inner[0];
+        }
+
+        BigInteger[] res = new BigInteger[nrOfRows];
+
+        for (int row = 0; row < nrOfRows; row++) {
+            res[row] = inner[row][0];
+        }
+
+        return res;
+    }
+    /**
+     * Does matrix multiplication, mod the modulo parameter
+     *
+     * @param b right-hand matrix
+     * @param modulo the modulo for the group
+     * @return this X B mod <i>modulo</i>
+     */
     @SuppressWarnings("UnnecessaryLocalVariable")//Readability
-    public Matrix multiply(Matrix b) {
+    public Matrix multiply(Matrix b, BigInteger modulo) {
         if (nrOfCols != b.nrOfRows) {
             throw new MalformedMatrixException("Matrix with dimensions " + nrOfRows + "x" + nrOfCols +
                     " cannot be multiplied with matrix with dimensions " + b.nrOfRows + "x" + b.nrOfCols);
@@ -96,14 +125,21 @@ public class Matrix {
                     partial = partial.add(aVal.multiply(bVal));
                 }
 
-                result[row][col] = partial;
+                result[row][col] = partial.mod(modulo);
             }
         }
 
         return new Matrix(result);
     }
 
-    public Matrix add(Matrix b) {
+    /**
+     * Does matrix addition, mod the modulo parameter
+     *
+     * @param b other matrix
+     * @param modulo the modulo for the group
+     * @return this + B mod <i>modulo</i>
+     */
+    public Matrix add(Matrix b, BigInteger modulo) {
         Matrix a = this;
         if (a.getColumns() != b.getColumns() ||
                 a.getRows() != b.getRows()) {
@@ -115,12 +151,67 @@ public class Matrix {
 
         for (int row = 0; row < a.getRows(); row++) {
             for (int column = 0; column < a.getColumns(); column++) {
-                res[row][column] = a.get(row, column).add(b.get(row, column));
+                BigInteger aVal = a.get(row, column);
+                BigInteger bVal = b.get(row, column);
+                res[row][column] = aVal.add(bVal).mod(modulo);
             }
         }
 
         return new Matrix(res);
     }
+
+    /**
+     * Creates a matrix, with the new row appended to the matrix
+     *
+     * @param newRow the row to be appended underneath. Must have length=numberOfCols
+     * @return new matrix with the extra row
+     */
+    public Matrix addRow(BigInteger[] newRow) {
+        if (newRow.length != nrOfCols) {
+            throw new MalformedMatrixException("New row must have the same length as the matrix has columns");
+        }
+
+        BigInteger[][] res = new BigInteger[nrOfRows + 1][nrOfCols];
+        for (int i = 0; i < nrOfRows; i++) {
+            res[i] = Arrays.copyOf(inner[i], nrOfCols);
+        }
+        res[nrOfRows] = Arrays.copyOf(newRow, nrOfCols);
+
+        return new Matrix(res);
+    }
+
+    /**
+     * Creates a matrix, with the new column appended to the matrix
+     *
+     * @param newColumn the column to be appended to the right. Must have length=numberOfRows
+     * @return new matrix with the extra column
+     */
+    public Matrix addColumn(BigInteger[] newColumn) {
+        if (newColumn.length != nrOfRows) {
+            throw new MalformedMatrixException("New column must have the same length as the matrix has rows");
+        }
+
+        BigInteger[][] res = new BigInteger[nrOfRows][nrOfCols + 1];
+        for (int i = 0; i < nrOfRows; i++) {
+            res[i] = Arrays.copyOf(inner[i], nrOfCols + 1);
+            res[i][nrOfCols] = newColumn[i];
+        }
+
+        return new Matrix(res);
+    }
+
+    public Matrix negate() {
+        BigInteger[][] res = new BigInteger[nrOfRows][nrOfCols];
+
+        for (int row = 0; row < nrOfRows; row++) {
+            for (int col = 0; col < nrOfCols; col++) {
+                res[row][col] = inner[row][col].negate();
+            }
+        }
+
+        return new Matrix(res);
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -147,7 +238,7 @@ public class Matrix {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for (BigInteger[] bigIntegers : inner) {
-            sb.append(Arrays.toString(bigIntegers)).append(",");
+            sb.append(Arrays.toString(bigIntegers));
         }
 
         sb.append("]");
