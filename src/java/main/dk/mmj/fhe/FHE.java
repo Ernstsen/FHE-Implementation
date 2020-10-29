@@ -2,6 +2,8 @@ package dk.mmj.fhe;
 
 import org.bouncycastle.pqc.math.linearalgebra.Matrix;
 
+import java.util.Objects;
+
 /**
  * Fully Homomorphic Encryption
  */
@@ -39,5 +41,27 @@ public interface FHE {
     class KeyPair {
         private Matrix secretKey;
         private Matrix publicKey;
+
+        public Matrix getSecretKey() {
+            return secretKey;
+        }
+
+        public Matrix getPublicKey() {
+            return publicKey;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            KeyPair keyPair = (KeyPair) o;
+            return Objects.equals(secretKey, keyPair.secretKey) &&
+                    Objects.equals(publicKey, keyPair.publicKey);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(secretKey, publicKey);
+        }
     }
 }
