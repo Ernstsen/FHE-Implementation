@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FHE-Implementation.iml" filepath="$PROJECT_DIR$/FHE-Implementation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fhe.iml" filepath="$PROJECT_DIR$/fhe.iml" />
     </modules>
   </component>
 </project>
