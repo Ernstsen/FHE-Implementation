@@ -8,6 +8,7 @@ import java.security.SecureRandom;
 import static java.math.BigInteger.valueOf;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotEquals;
 
 public class TestMatrix {
@@ -229,6 +230,30 @@ public class TestMatrix {
         Matrix sum = a.multiply(a, valueOf(10));
 
         assertEquals("Matrix multiplication went wrong, using modulo", c, sum);
+    }
+
+    @Test
+    public void testRowAsVector(){
+        BigInteger[] row = {valueOf(2), valueOf(4)};
+        BigInteger[][] inner = {
+                row,
+        };
+        Matrix matrix = new Matrix(inner);
+
+        assertArrayEquals("Did not return the row as expected", row, matrix.asVector());
+    }
+
+    @Test
+    public void testColumnAsVector(){
+        BigInteger[] column = {valueOf(2), valueOf(4)};
+        BigInteger[][] inner = {
+                {column[0]},
+                {column[1]},
+        };
+        Matrix matrix = new Matrix(inner);
+
+        assertArrayEquals("Did not return the column as expected", column, matrix.asVector());
+
     }
 
 }
