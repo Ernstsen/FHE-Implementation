@@ -29,8 +29,6 @@ public class TestLWE {
                 "Keypairs not allowed to be the same, for two calls (only with very small prob.)",
                 keyPair, keyPair2
         );
-
-        //TODO: Assert security parameter is not ignored
     }
 
     @Test

@@ -34,13 +34,13 @@ public class LWE implements FHE {
 
         Matrix t = new Matrix(1, n, rand, q);
 
-        Matrix e = new Matrix(m, 1, rand, BigInteger.valueOf(n));
+        Matrix e = new Matrix(1, m, rand, BigInteger.valueOf(n));
 
-//        Matrix b = t * bigB + e;
+        Matrix b = t.multiply(bigB).add(e);
 
         return new KeyPair(
-                new LWESecretKey(null),
-                new LWEPublicKey(null)
+                new LWESecretKey(t),
+                new LWEPublicKey(b)
         );
     }
 
