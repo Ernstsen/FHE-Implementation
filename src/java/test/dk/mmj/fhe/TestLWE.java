@@ -1,5 +1,7 @@
 package dk.mmj.fhe;
 
+import dk.mmj.fhe.interfaces.Ciphertext;
+import dk.mmj.fhe.interfaces.FHE;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -7,7 +9,7 @@ import static org.junit.Assert.*;
 
 @SuppressWarnings("ConstantConditions")
 public class TestLWE {
-    private final int securityParameter = 128;
+    private final int securityParameter = 64;
     private FHE lwe;
     private FHE.KeyPair keyPair;
 

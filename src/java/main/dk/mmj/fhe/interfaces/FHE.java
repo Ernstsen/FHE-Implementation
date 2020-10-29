@@ -1,6 +1,4 @@
-package dk.mmj.fhe;
-
-import org.ejml.simple.SimpleMatrix;
+package dk.mmj.fhe.interfaces;
 
 import java.util.Objects;
 
@@ -24,7 +22,7 @@ public interface FHE {
      * @param publicKey the secret key to encrypt m under
      * @return encryption of m under publicKey
      */
-    Ciphertext encrypt(boolean m, SimpleMatrix publicKey);
+    Ciphertext encrypt(boolean m, PublicKey publicKey);
 
     /**
      * Decrypts a message encrypted under the publicKey, related to the given secretKey
@@ -33,20 +31,25 @@ public interface FHE {
      * @param secretKey the secret key, relating to the public key used for encryption
      * @return the plaintext value x where c = ENC(x)
      */
-    boolean decrypt(Ciphertext c, SimpleMatrix secretKey);
+    boolean decrypt(Ciphertext c, SecretKey secretKey);
 
     /**
      * Keypair for the fully homomorphic encryption scheme
      */
     class KeyPair {
-        private SimpleMatrix secretKey;
-        private SimpleMatrix publicKey;
+        private SecretKey secretKey;
+        private PublicKey publicKey;
 
-        public SimpleMatrix getSecretKey() {
+        public KeyPair(SecretKey secretKey, PublicKey publicKey) {
+            this.secretKey = secretKey;
+            this.publicKey = publicKey;
+        }
+
+        public SecretKey getSecretKey() {
             return secretKey;
         }
 
-        public SimpleMatrix getPublicKey() {
+        public PublicKey getPublicKey() {
             return publicKey;
         }
 

@@ -1,4 +1,6 @@
 package dk.mmj.fhe;
 
-public class LWECiphertext implements Ciphertext{
+import dk.mmj.fhe.interfaces.Ciphertext;
+
+public class LWECiphertext implements Ciphertext {
 }

@@ -1,4 +1,4 @@
-package dk.mmj.fhe;
+package dk.mmj.fhe.interfaces;
 
 /**
  * Ciphertext for a Fully Homomorphic Encryption Scheme
