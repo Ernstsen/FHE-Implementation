@@ -3,6 +3,8 @@ package dk.mmj.matrix;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.stream.IntStream;
 
 /**
  * Matrix of BigIntegers
@@ -94,10 +96,11 @@ public class Matrix {
 
         return res;
     }
+
     /**
      * Does matrix multiplication, mod the modulo parameter
      *
-     * @param b right-hand matrix
+     * @param b      right-hand matrix
      * @param modulo the modulo for the group
      * @return this X B mod <i>modulo</i>
      */
@@ -110,12 +113,30 @@ public class Matrix {
         Matrix a = this;
 
         int m = a.nrOfRows;
-        int n = b.nrOfRows;
         int p = b.nrOfCols;
 
-        BigInteger[][] result = new BigInteger[m][p];
+        final BigInteger[][] result = new BigInteger[m][p];
 
-        for (int row = 0; row < m; row++) {
+        //Compute the resulting row, using a parallel stream to properly utilize multi-core CPU
+        IntStream.range(0, m).parallel().forEach(computeRowMultiplication(result, a, b, modulo));
+
+        return new Matrix(result);
+    }
+
+    /**
+     * Builds an {@link IntConsumer} which computes a row of the resulting matrix, used in matrix multiplication
+     *
+     * @param res    the matrix to write the resulting row to
+     * @param a      matrix a from the multiplication
+     * @param b      matrix b from he multiplication
+     * @param modulo the modulo for the multiplication
+     * @return an intConsumer for computing multiplication for a given row
+     */
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    private IntConsumer computeRowMultiplication(final BigInteger[][] res, final Matrix a, final Matrix b, final BigInteger modulo) {
+        final int n = b.nrOfRows;
+        final int p = b.nrOfCols;
+        return row -> {
             for (int col = 0; col < p; col++) {
                 BigInteger partial = BigInteger.ZERO;
 
@@ -124,18 +145,15 @@ public class Matrix {
                     BigInteger bVal = b.get(i, col);
                     partial = partial.add(aVal.multiply(bVal));
                 }
-
-                result[row][col] = partial.mod(modulo);
+                res[row][col] = partial.mod(modulo);
             }
-        }
-
-        return new Matrix(result);
+        };
     }
 
     /**
      * Does matrix addition, mod the modulo parameter
      *
-     * @param b other matrix
+     * @param b      other matrix
      * @param modulo the modulo for the group
      * @return this + B mod <i>modulo</i>
      */

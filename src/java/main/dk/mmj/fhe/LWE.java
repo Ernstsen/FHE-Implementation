@@ -28,7 +28,7 @@ public class LWE implements FHE {
      */
     public KeyPair generateKey(int securityParameter) {
         BigInteger q = new BigInteger(securityParameter, rand);
-        int n = securityParameter / 2;
+        int n = securityParameter / 2;//Todo: Fix!
         int m = n * nFactorToM;
 
         Matrix bigB = new Matrix(n, m, rand, q);
