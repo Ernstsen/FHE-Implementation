@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import static java.math.BigInteger.valueOf;
+import static java.math.BigInteger.*;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertArrayEquals;
@@ -233,7 +233,7 @@ public class TestMatrix {
     }
 
     @Test
-    public void testRowAsVector(){
+    public void testRowAsVector() {
         BigInteger[] row = {valueOf(2), valueOf(4)};
         BigInteger[][] inner = {
                 row,
@@ -244,7 +244,7 @@ public class TestMatrix {
     }
 
     @Test
-    public void testColumnAsVector(){
+    public void testColumnAsVector() {
         BigInteger[] column = {valueOf(2), valueOf(4)};
         BigInteger[][] inner = {
                 {column[0]},
@@ -254,6 +254,20 @@ public class TestMatrix {
 
         assertArrayEquals("Did not return the column as expected", column, matrix.asVector());
 
+    }
+
+    @Test
+    public void testDecomposeInteger() {
+        BigInteger number = new BigInteger("42");
+
+        Matrix decomposition = Matrix.decompose(number);
+
+        BigInteger[] vectorDecomposition = decomposition.asVector();
+
+        assertEquals("Wrong size of decomposition", 6, vectorDecomposition.length);
+
+        BigInteger[] expected = {ZERO, ONE, ZERO, ONE, ZERO, ONE};
+        assertArrayEquals("Decomposition not as expected", expected, vectorDecomposition);
     }
 
 }

@@ -266,4 +266,17 @@ public class Matrix {
                 "inner=" + sb.toString() +
                 '}';
     }
+
+    public static Matrix decompose(BigInteger x){
+        int len = x.bitLength();
+
+        BigInteger[][] inner = new BigInteger[len][1];
+
+        for (int i = 0; i < len; i++) {
+            BigInteger pow = BigInteger.valueOf(2).pow(i);
+            inner[i][0] = x.and(pow).equals(pow) ? BigInteger.ONE : BigInteger.ZERO;
+        }
+
+        return new Matrix(inner);
+    }
 }
