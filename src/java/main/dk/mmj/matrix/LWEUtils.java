@@ -3,6 +3,9 @@ package dk.mmj.matrix;
 
 import java.math.BigInteger;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+
 @SuppressWarnings("UnnecessaryLocalVariable")//Readability is important
 public class LWEUtils {
 
@@ -62,5 +65,31 @@ public class LWEUtils {
         }
 
         return res;
+    }
+
+    /**
+     * Reads a bit from the ciphertext
+     *
+     * @param sc        secret key multiplied with ciphertext
+     * @param sg        secret key multiplied with G
+     * @param modulus   modulus used in cryptosystem
+     * @param bitNumber 0-indexed bit-number to be extracted
+     * @return whether the decrypted bit is true or false
+     */
+    public static boolean readBit(Matrix sc, Matrix sg,
+                                  BigInteger modulus, int bitNumber) {
+        final BigInteger leftBitValue = sc.get(0, 0);
+
+        final Matrix zeroHypothesis = sg.multiply(ZERO, modulus);
+        final Matrix oneHypothesis = sg.multiply(ONE, modulus);
+
+        final BigInteger zeroHBitValue = zeroHypothesis.get(0, bitNumber);
+        final BigInteger oneHBitValue = oneHypothesis.get(0, bitNumber);
+
+        final BigInteger zeroDiff = leftBitValue.subtract(zeroHBitValue).abs();
+        final BigInteger oneDiff = leftBitValue.subtract(oneHBitValue).abs();
+
+        //Returns true if oneDiff is larger than or equals to zeroDiff
+        return zeroDiff.compareTo(oneDiff) >= 0;
     }
 }

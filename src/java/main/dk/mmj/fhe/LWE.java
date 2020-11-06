@@ -75,28 +75,21 @@ public class LWE implements FHE {
         if (!(c instanceof LWECiphertext)) {
             throw new RuntimeException("Ciphertext must be for LWE system!");
         }
+
         if (!(secretKey instanceof LWESecretKey)) {
             throw new RuntimeException("Key must be for LWE system");
         }
+        final LWESecretKey sk = (LWESecretKey) secretKey;
 
         Matrix cMatrix = ((LWECiphertext) c).getC();
-        
+        final Matrix s = sk.getS();
 
-        BigInteger[] smallG = LWEUtils.calculateSmallG(cMatrix.getColumns());
+        final BigInteger q = sk.getQ();
+        final Matrix sC = s.multiply(cMatrix, q);
 
-        for (int i = 0; i < cMatrix.getRows(); i++) {
-            BigInteger[] row = cMatrix.getRow(i);
+        final Matrix bigG = LWEUtils.createG(s.getColumns(), q);
+        final Matrix sG = s.multiply(bigG, q);
 
-            BigInteger x = LWEUtils.innerProduct(row, smallG);
-            BigInteger v = smallG[i];
-
-            BigInteger[] partialResult = x.divideAndRemainder(v);
-
-            System.out.println(Arrays.toString(partialResult));
-
-        }
-
-
-        return false;
+        return LWEUtils.readBit(sC, sG, q, 0);
     }
 }
