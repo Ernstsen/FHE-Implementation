@@ -167,6 +167,26 @@ public class TestMatrix {
         assertEquals("Matrix multiplication went wrong", c, product);
     }
 
+    @SuppressWarnings("PointlessArithmeticExpression")
+    @Test
+    public void testMatrixMultiplicationWithConstant() {
+        BigInteger[][] inner = {
+                {valueOf(1), valueOf(4), valueOf(5)},
+                {valueOf(5), valueOf(8), valueOf(9)},
+        };
+
+        BigInteger[][] innerExpected = {
+                {valueOf(1 * 3), valueOf(4 * 3), valueOf(5 * 3)},
+                {valueOf(5 * 3), valueOf(8 * 3), valueOf(9 * 3)},
+        };
+
+        Matrix matrix = new Matrix(inner);
+        Matrix res = matrix.multiply(valueOf(3), MODULO);
+
+        assertEquals("Unexpected result", new Matrix(innerExpected), res);
+    }
+
+
     @Test
     public void testMatrixAdd() {
         BigInteger[][] innerA = {

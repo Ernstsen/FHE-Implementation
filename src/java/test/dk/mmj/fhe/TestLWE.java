@@ -42,7 +42,7 @@ public class TestLWE {
 
     @Test
     public void testEncryptDecrypt() {
-        for (boolean m : new Boolean[]{true, false}) {
+        for (boolean m : new Boolean[]{false, true}) {
             Ciphertext c = lwe.encrypt(m, keyPair.getPublicKey());
             boolean decrypt = lwe.decrypt(c, keyPair.getSecretKey());
 

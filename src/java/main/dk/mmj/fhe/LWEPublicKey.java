@@ -8,10 +8,12 @@ import java.math.BigInteger;
 public class LWEPublicKey implements PublicKey {
     private final Matrix key;
     private final BigInteger q;
+    private final int n;
 
-    public LWEPublicKey(Matrix key, BigInteger q) {
+    public LWEPublicKey(Matrix key, BigInteger q, int n) {
         this.key = key;
         this.q = q;
+        this.n = n;
     }
 
     public Matrix getKey() {
@@ -20,5 +22,9 @@ public class LWEPublicKey implements PublicKey {
 
     public BigInteger getQ() {
         return q;
+    }
+
+    public int getN() {
+        return n;
     }
 }

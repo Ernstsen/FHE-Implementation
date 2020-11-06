@@ -75,6 +75,14 @@ public class Matrix {
     }
 
     /**
+     * @param row which row to get
+     * @return the row as a BigInteger array
+     */
+    public BigInteger[] getRow(int row){
+        return inner[row];
+    }
+
+    /**
      * If the matrix has either one row, or one column, this method will return said row/column as an array
      *
      * @return the matrix as a vector
@@ -124,14 +132,35 @@ public class Matrix {
     }
 
     /**
-     * Builds an {@link IntConsumer} which computes a row of the resulting matrix, used in matrix multiplication
+     * Multiplies matrix with a constant c
      *
-     * @param res    the matrix to write the resulting row to
-     * @param a      matrix a from the multiplication
-     * @param b      matrix b from he multiplication
-     * @param modulo the modulo for the multiplication
-     * @return an intConsumer for computing multiplication for a given row
+     * @param c      the constant
+     * @param modulo the modulo
+     * @return new matrix which is this * c
      */
+    public Matrix multiply(BigInteger c, BigInteger modulo) {
+        int rows = getRows();
+        int columns = getColumns();
+        BigInteger[][] res = new BigInteger[rows][columns];
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
+                res[row][col] = get(row, col).multiply(c).mod(modulo);
+            }
+        }
+
+        return new Matrix(res);
+    }
+
+    /**
+         * Builds an {@link IntConsumer} which computes a row of the resulting matrix, used in matrix multiplication
+         *
+         * @param res    the matrix to write the resulting row to
+         * @param a      matrix a from the multiplication
+         * @param b      matrix b from he multiplication
+         * @param modulo the modulo for the multiplication
+         * @return an intConsumer for computing multiplication for a given row
+         */
     @SuppressWarnings("UnnecessaryLocalVariable")
     private IntConsumer computeRowMultiplication(final BigInteger[][] res, final Matrix a, final Matrix b, final BigInteger modulo) {
         final int n = b.nrOfRows;

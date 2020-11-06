@@ -41,6 +41,18 @@ public class TestLWEUtils {
         assertArrayEquals("Unexpected array returned", expected, bigIntegers);
     }
 
+    @Test
+    public void testDotProduct(){
+        BigInteger[] v1 = {valueOf(1), valueOf(3), valueOf(-5)};
+        BigInteger[] v2 = {valueOf(4), valueOf(-2), valueOf(-1)};
+
+        BigInteger expected = valueOf(3);
+        BigInteger res = LWEUtils.innerProduct(v1, v2);
+
+        assertEquals(expected, res);
+
+    }
+
     private static BigInteger[] toBigIntArray(int[] ints){
         return Arrays.stream(ints).mapToObj(BigInteger::valueOf).toArray(BigInteger[]::new);
     }

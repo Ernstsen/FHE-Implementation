@@ -18,7 +18,7 @@ public interface FHE {
     /**
      * Encrypts a message under the secret key
      *
-     * @param m the bit to be encrypted
+     * @param m the integer to be encrypted
      * @param publicKey the secret key to encrypt m under
      * @return encryption of m under publicKey
      */
@@ -37,8 +37,8 @@ public interface FHE {
      * Keypair for the fully homomorphic encryption scheme
      */
     class KeyPair {
-        private SecretKey secretKey;
-        private PublicKey publicKey;
+        private final SecretKey secretKey;
+        private final PublicKey publicKey;
 
         public KeyPair(SecretKey secretKey, PublicKey publicKey) {
             this.secretKey = secretKey;
