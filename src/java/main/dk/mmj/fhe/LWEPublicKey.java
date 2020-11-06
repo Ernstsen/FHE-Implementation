@@ -23,8 +23,4 @@ public class LWEPublicKey implements PublicKey {
     public BigInteger getQ() {
         return q;
     }
-
-    public int getN() {
-        return n;
-    }
 }
