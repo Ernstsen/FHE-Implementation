@@ -67,6 +67,13 @@ public class LWEUtils {
         return res;
     }
 
+    public static Matrix calculateGInverse(Matrix g){
+
+
+        return null;
+    }
+
+
     /**
      * Reads a bit from the ciphertext
      *

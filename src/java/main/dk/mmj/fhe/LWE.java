@@ -52,11 +52,8 @@ public class LWE implements FHE {
     }
 
     public Ciphertext encrypt(boolean x, PublicKey publicKey) {
-        if (!(publicKey instanceof LWEPublicKey)) {
-            throw new RuntimeException("Key must be for LWE system");
-        }
+        LWEPublicKey key = assertOwnKey(publicKey);
 
-        LWEPublicKey key = (LWEPublicKey) publicKey;
         Matrix a = key.getKey();
         BigInteger q = key.getQ();
         int n = a.getRows();
@@ -91,5 +88,26 @@ public class LWE implements FHE {
         final Matrix sG = s.multiply(bigG, q);
 
         return LWEUtils.readBit(sC, sG, q, 0);
+    }
+
+    @Override
+    public Ciphertext nand(Ciphertext c1, Ciphertext c2, PublicKey pk) {
+        LWEPublicKey key = assertOwnKey(pk);
+
+        Matrix a = key.getKey();
+        BigInteger q = key.getQ();
+        int n = a.getRows();
+
+        Matrix bigG = LWEUtils.createG(n, q);
+
+
+        return null;
+    }
+
+    private LWEPublicKey assertOwnKey(PublicKey pk) {
+        if (!(pk instanceof LWEPublicKey)) {
+            throw new RuntimeException("Key must be for LWE system");
+        }
+        return (LWEPublicKey) pk;
     }
 }

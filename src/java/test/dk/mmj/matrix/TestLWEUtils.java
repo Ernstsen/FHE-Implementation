@@ -53,6 +53,13 @@ public class TestLWEUtils {
 
     }
 
+    @Test
+    public void testGInverse(){
+
+
+
+    }
+
     private static BigInteger[] toBigIntArray(int[] ints){
         return Arrays.stream(ints).mapToObj(BigInteger::valueOf).toArray(BigInteger[]::new);
     }

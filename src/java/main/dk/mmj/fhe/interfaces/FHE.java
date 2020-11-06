@@ -18,7 +18,7 @@ public interface FHE {
     /**
      * Encrypts a message under the secret key
      *
-     * @param m the integer to be encrypted
+     * @param m         the integer to be encrypted
      * @param publicKey the secret key to encrypt m under
      * @return encryption of m under publicKey
      */
@@ -27,11 +27,21 @@ public interface FHE {
     /**
      * Decrypts a message encrypted under the publicKey, related to the given secretKey
      *
-     * @param c the ciphertext
+     * @param c         the ciphertext
      * @param secretKey the secret key, relating to the public key used for encryption
      * @return the plaintext value x where c = ENC(x)
      */
     boolean decrypt(Ciphertext c, SecretKey secretKey);
+
+    /**
+     * Evaluates nand on two encrypted messages
+     *
+     * @param c1 ENC_pk(m1)
+     * @param c2 ENC_pk(m2)
+     * @param pk public key for system
+     * @return ENC_pk(nand ( m1, m2))
+     */
+    Ciphertext nand(Ciphertext c1, Ciphertext c2, PublicKey pk);
 
     /**
      * Keypair for the fully homomorphic encryption scheme
