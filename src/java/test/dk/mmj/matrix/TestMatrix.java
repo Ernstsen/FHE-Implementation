@@ -280,7 +280,7 @@ public class TestMatrix {
     public void testDecomposeInteger() {
         BigInteger number = new BigInteger("42");
 
-        Matrix decomposition = Matrix.decompose(number);
+        Matrix decomposition = Matrix.decompose(number, 6);
 
         BigInteger[] vectorDecomposition = decomposition.asVector();
 
@@ -288,6 +288,25 @@ public class TestMatrix {
 
         BigInteger[] expected = {ZERO, ONE, ZERO, ONE, ZERO, ONE};
         assertArrayEquals("Decomposition not as expected", expected, vectorDecomposition);
+    }
+
+    @Test
+    public void testTranspose() {
+        final Matrix org = new Matrix(
+                new BigInteger[][]{
+                        {valueOf(4), valueOf(8), valueOf(12)},
+                        {valueOf(45), valueOf(15), valueOf(56)}}
+        );
+
+        final Matrix expected = new Matrix(
+                new BigInteger[][]{
+                        {valueOf(4), valueOf(45)},
+                        {valueOf(8), valueOf(15)},
+                        {valueOf(12), valueOf(56)}
+                }
+        );
+
+        assertEquals("Transpose not working", expected, org.transpose());
     }
 
 }

@@ -3,8 +3,7 @@ package dk.mmj.matrix;
 
 import java.math.BigInteger;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
+import static java.math.BigInteger.*;
 
 @SuppressWarnings("UnnecessaryLocalVariable")//Readability is important
 public class LWEUtils {
@@ -23,9 +22,13 @@ public class LWEUtils {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
-                inner[row][col] = BigInteger.ZERO;
+                if(row == col){
+                    inner[row][col] = valueOf(2).pow(row);
+                }else {
+                    inner[row][col] = BigInteger.ZERO;
+                }
             }
-            System.arraycopy(g, 0, inner[row], row, g.length);
+//            System.arraycopy(g, 0, inner[row], row, g.length);
         }
 
         return new Matrix(inner);
@@ -67,7 +70,8 @@ public class LWEUtils {
         return res;
     }
 
-    public static Matrix calculateGInverse(Matrix g){
+    public static Matrix calculateGInverse(Matrix g) {
+
 
 
         return null;

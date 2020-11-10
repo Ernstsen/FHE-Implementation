@@ -55,6 +55,17 @@ public class Matrix {
         }
     }
 
+    public static Matrix decompose(BigInteger x, int len) {
+        BigInteger[][] inner = new BigInteger[len][1];
+
+        for (int i = 0; i < len; i++) {
+            BigInteger pow = BigInteger.valueOf(2).pow(i);
+            inner[i][0] = x.and(pow).equals(pow) ? BigInteger.ONE : BigInteger.ZERO;
+        }
+
+        return new Matrix(inner);
+    }
+
     public int getRows() {
         return nrOfRows;
     }
@@ -78,7 +89,7 @@ public class Matrix {
      * @param row which row to get
      * @return the row as a BigInteger array
      */
-    public BigInteger[] getRow(int row){
+    public BigInteger[] getRow(int row) {
         return inner[row];
     }
 
@@ -153,14 +164,14 @@ public class Matrix {
     }
 
     /**
-         * Builds an {@link IntConsumer} which computes a row of the resulting matrix, used in matrix multiplication
-         *
-         * @param res    the matrix to write the resulting row to
-         * @param a      matrix a from the multiplication
-         * @param b      matrix b from he multiplication
-         * @param modulo the modulo for the multiplication
-         * @return an intConsumer for computing multiplication for a given row
-         */
+     * Builds an {@link IntConsumer} which computes a row of the resulting matrix, used in matrix multiplication
+     *
+     * @param res    the matrix to write the resulting row to
+     * @param a      matrix a from the multiplication
+     * @param b      matrix b from he multiplication
+     * @param modulo the modulo for the multiplication
+     * @return an intConsumer for computing multiplication for a given row
+     */
     @SuppressWarnings("UnnecessaryLocalVariable")
     private IntConsumer computeRowMultiplication(final BigInteger[][] res, final Matrix a, final Matrix b, final BigInteger modulo) {
         final int n = b.nrOfRows;
@@ -259,6 +270,17 @@ public class Matrix {
         return new Matrix(res);
     }
 
+    public Matrix transpose(){
+        BigInteger[][] res = new BigInteger[nrOfCols][nrOfRows];
+
+        for (int row = 0; row < nrOfCols; row++) {
+            for (int col = 0; col < getRows(); col++) {
+                res[row][col] = inner[col][row];
+            }
+        }
+
+        return new Matrix(res);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -294,18 +316,5 @@ public class Matrix {
         return "Matrix{" +
                 "inner=" + sb.toString() +
                 '}';
-    }
-
-    public static Matrix decompose(BigInteger x){
-        int len = x.bitLength();
-
-        BigInteger[][] inner = new BigInteger[len][1];
-
-        for (int i = 0; i < len; i++) {
-            BigInteger pow = BigInteger.valueOf(2).pow(i);
-            inner[i][0] = x.and(pow).equals(pow) ? BigInteger.ONE : BigInteger.ZERO;
-        }
-
-        return new Matrix(inner);
     }
 }
