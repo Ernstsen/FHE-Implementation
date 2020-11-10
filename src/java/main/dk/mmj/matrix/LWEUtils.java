@@ -2,6 +2,7 @@ package dk.mmj.matrix;
 
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import static java.math.BigInteger.*;
 
@@ -75,6 +76,16 @@ public class LWEUtils {
 
 
         return null;
+    }
+
+    /**
+     * Calculates sum of all entries in array
+     *
+     * @param arr array to calculate sum of
+     * @return sum of all entries
+     */
+    public static BigInteger arraySum(BigInteger[] arr){
+        return Arrays.stream(arr).reduce(BigInteger::add).orElse(BigInteger.ZERO);
     }
 
 

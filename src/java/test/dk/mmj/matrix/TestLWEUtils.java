@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import static dk.mmj.matrix.LWEUtils.arraySum;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.valueOf;
 import static org.junit.Assert.*;
@@ -62,25 +63,38 @@ public class TestLWEUtils {
     @Test
     public void testGInverse() {
         final BigInteger q = new BigInteger(16, new SecureRandom());
-//        final BigInteger[] vals = {valueOf(1), valueOf(3), valueOf(7), valueOf(8)};
-//        final BigInteger[][] inner = Arrays.stream(vals).map(v -> Matrix.decompose(v, q.bitLength())).map(Matrix::asVector).toArray(BigInteger[][]::new);
-//        final Matrix matrix = new Matrix(inner);
+        final BigInteger[] vals = {valueOf(1), valueOf(3), valueOf(7), valueOf(8)};
 
+        //BEGIN: DECOMPOSE
+        //Write each value as a decomposed bitstring (row)
+        final BigInteger[][] inner = Arrays.stream(vals).map(v -> Matrix.decompose(v, q.bitLength())).map(Matrix::asVector).toArray(BigInteger[][]::new);
+        final Matrix matrix = new Matrix(inner).transpose();//We create the matrix, and then write the numbers on columns, instead of rows
 
+        //BEGIN: RECOMPOSE
+        Matrix g1 = LWEUtils.createG(q.bitLength(), q);
 
-        final Matrix val = new Matrix(new BigInteger[][]{
-                {valueOf(1), valueOf(0), valueOf(0), valueOf(0)},//1
-                {valueOf(1), valueOf(1), valueOf(0), valueOf(0)},//3
-                {valueOf(1), valueOf(1), valueOf(1), valueOf(0)}//7
-        }).transpose();//numbers in columns
-        final Matrix g1 = LWEUtils.createG(4, q);
+        final Matrix multiply1 = g1.transpose().multiply(matrix, q);
+        Matrix readable = multiply1.transpose();//We transpose, so that numbers are on rows instead of columns - prettier to read
 
-        final Matrix multiply1 = g1.transpose().multiply(val, q);
+        assertEquals("Should be one", ONE, arraySum(readable.getRow(0)));
+        assertEquals("Should be three", valueOf(3), arraySum(readable.getRow(1)));
+        assertEquals("Should be seven", valueOf(7), arraySum(readable.getRow(2)));
+        assertEquals("Should be eight", valueOf(8), arraySum(readable.getRow(3)));
 
-        assertEquals("Should be one", ONE, Arrays.stream(multiply1.transpose().getRow(0)).reduce(BigInteger::add).orElse(BigInteger.ZERO));
-        assertEquals("Should be one", valueOf(3), Arrays.stream(multiply1.transpose().getRow(1)).reduce(BigInteger::add).orElse(BigInteger.ZERO));
-        assertEquals("Should be one", valueOf(7), Arrays.stream(multiply1.transpose().getRow(2)).reduce(BigInteger::add).orElse(BigInteger.ZERO));
+        fail("Still not testing the correct thing..");
+    }
 
+    @Test
+    public void testArraySum(){
+        BigInteger[] bigIntegers = {valueOf(4), valueOf(87), valueOf(89)};
+        BigInteger sum = arraySum(bigIntegers);
+
+        assertEquals("Wrong sum calculated", valueOf(180), sum);
+    }
+
+    @Test
+    public void testDecomposeRecompose() {
+        //Number and vector:
         final Matrix decompose = Matrix.decompose(valueOf(42), 6);
         final BigInteger[] g = LWEUtils.calculateSmallG(6);
 
@@ -89,7 +103,6 @@ public class TestLWEUtils {
         final Matrix multiply = gMatrix.multiply(decompose, valueOf(1_000_000));
 
         final BigInteger[] bigIntegers = multiply.asVector();
-        assertEquals(valueOf(42), bigIntegers[0]);
-        fail("Still not testing the correct thing..");
+        assertEquals("Recompose failed", valueOf(42), bigIntegers[0]);
     }
 }
