@@ -9,6 +9,7 @@ import dk.mmj.matrix.LWEUtils;
 import dk.mmj.matrix.Matrix;
 
 import java.math.BigInteger;
+import java.security.InvalidParameterException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -93,6 +94,8 @@ public class LWE implements FHE {
     @Override
     public Ciphertext nand(Ciphertext c1, Ciphertext c2, PublicKey pk) {
         LWEPublicKey key = assertOwnKey(pk);
+        Matrix c1M = assertOwnCiphertext(c1).getC();
+        Matrix c2M = assertOwnCiphertext(c2).getC();
 
         Matrix a = key.getKey();
         BigInteger q = key.getQ();
@@ -100,8 +103,10 @@ public class LWE implements FHE {
 
         Matrix bigG = LWEUtils.createG(n, q);
 
-
-        return null;
+        Matrix gInverse = LWEUtils.calculateGInverse(c2M, n, q);
+        Matrix product = c1M.multiply(gInverse, q);
+        Matrix c3 = bigG.subtract(product, q);
+        return new LWECiphertext(c3);
     }
 
     private LWEPublicKey assertOwnKey(PublicKey pk) {
@@ -109,5 +114,22 @@ public class LWE implements FHE {
             throw new RuntimeException("Key must be for LWE system");
         }
         return (LWEPublicKey) pk;
+    }
+
+    private LWECiphertext assertOwnCiphertext(Ciphertext c) {
+        if (!(c instanceof LWECiphertext)) {
+            throw new RuntimeException("Ciphertext must be for LWE system");
+        }
+        return (LWECiphertext) c;
+    }
+
+    public static void main(String[] args) {
+        int q = 65537;
+        double alpha = 0.000976562500000000;
+
+        SecureRandom secureRandom = new SecureRandom();
+        for (int i = 0; i < 50; i++) {
+            System.out.println("val: " + ((int)(secureRandom.nextGaussian() * alpha*q) % q));
+        }
     }
 }

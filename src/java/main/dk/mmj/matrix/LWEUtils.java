@@ -23,13 +23,13 @@ public class LWEUtils {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
-                if(row == col){
+                if (row == col) {
                     inner[row][col] = valueOf(2).pow(row);
-                }else {
+                } else {
                     inner[row][col] = BigInteger.ZERO;
                 }
             }
-//            System.arraycopy(g, 0, inner[row], row, g.length);
+            System.arraycopy(g, 0, inner[row], row, g.length);
         }
 
         return new Matrix(inner);
@@ -71,11 +71,13 @@ public class LWEUtils {
         return res;
     }
 
-    public static Matrix calculateGInverse(Matrix g) {
+    public static Matrix calculateGInverse(Matrix g, int n, BigInteger q) {
+        int columns = n*100;
+        int ceilLogQ = q.bitLength();
+        int rows = n * ceilLogQ;
+        BigInteger[][] inner = new BigInteger[rows][columns];
 
-
-
-        return null;
+        return new Matrix(inner);
     }
 
     /**
@@ -84,7 +86,7 @@ public class LWEUtils {
      * @param arr array to calculate sum of
      * @return sum of all entries
      */
-    public static BigInteger arraySum(BigInteger[] arr){
+    public static BigInteger arraySum(BigInteger[] arr) {
         return Arrays.stream(arr).reduce(BigInteger::add).orElse(BigInteger.ZERO);
     }
 

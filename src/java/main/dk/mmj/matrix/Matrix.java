@@ -218,6 +218,35 @@ public class Matrix {
         return new Matrix(res);
     }
 
+
+    /**
+     * Does matrix subtraction, mod the modulo parameter
+     *
+     * @param b      other matrix
+     * @param modulo the modulo for the group
+     * @return this - B mod <i>modulo</i>
+     */
+    public Matrix subtract(Matrix b, BigInteger modulo){
+        Matrix a = this;
+        if (a.getColumns() != b.getColumns() ||
+                a.getRows() != b.getRows()) {
+            throw new MalformedMatrixException("Matrix with dimensions " + nrOfRows + "x" + nrOfCols +
+                    " cannot be subtracted from matrix with dimensions " + b.nrOfRows + "x" + b.nrOfCols);
+        }
+
+        BigInteger[][] res = new BigInteger[a.nrOfRows][a.nrOfCols];
+
+        for (int row = 0; row < a.getRows(); row++) {
+            for (int column = 0; column < a.getColumns(); column++) {
+                BigInteger aVal = a.get(row, column);
+                BigInteger bVal = b.get(row, column);
+                res[row][column] = aVal.subtract(bVal).mod(modulo);
+            }
+        }
+
+        return new Matrix(res);
+    }
+
     /**
      * Creates a matrix, with the new row appended to the matrix
      *
