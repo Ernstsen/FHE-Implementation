@@ -1,7 +1,6 @@
 package dk.mmj.matrix;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
@@ -46,11 +45,11 @@ public class Matrix {
      * @param rand     provider of randomness for the instantiation
      * @param q        is the biggest allowed number (All calculations are mod q)
      */
-    public Matrix(int nrOfRows, int nrOfCols, SecureRandom rand, BigInteger q) {
+    public Matrix(int nrOfRows, int nrOfCols, Random rand, BigInteger q) {
         this(nrOfRows, nrOfCols);
         for (int col = 0; col < nrOfCols; col++) {
             for (int row = 0; row < nrOfRows; row++) {
-                inner[row][col] = new BigInteger(q.bitCount(), rand).mod(q);
+                inner[row][col] = rand.nextRandom(q);
             }
         }
     }
@@ -307,5 +306,15 @@ public class Matrix {
         }
 
         return new Matrix(inner);
+    }
+
+    /**
+     * Provides random values, without promise of distribution
+     */
+    public interface Random {
+        /**
+         * @return positive random value below q
+         */
+        BigInteger nextRandom(BigInteger q);
     }
 }
