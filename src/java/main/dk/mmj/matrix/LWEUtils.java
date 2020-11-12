@@ -22,14 +22,8 @@ public class LWEUtils {
         BigInteger[] g = calculateSmallG(ceilLogQ);
 
         for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < columns; col++) {
-                if (row == col) {
-                    inner[row][col] = valueOf(2).pow(row);
-                } else {
-                    inner[row][col] = BigInteger.ZERO;
-                }
-            }
-            System.arraycopy(g, 0, inner[row], row, g.length);
+            Arrays.fill(inner[row], ZERO);
+            System.arraycopy(g, 0, inner[row], row * g.length, g.length);
         }
 
         return new Matrix(inner);
@@ -71,13 +65,27 @@ public class LWEUtils {
         return res;
     }
 
-    public static Matrix calculateGInverse(Matrix g, int n, BigInteger q) {
-        int columns = n*100;
+    /**
+     * Evaluates G^{-1}(m) function on matrix m.
+     *
+     * @param m matrix (n x n*logQ)
+     * @param q q used in LWE system
+     * @return new Matrix
+     */
+    public static Matrix calculateGInverse(Matrix m, BigInteger q) {
+        Matrix mTrans = m.transpose();
         int ceilLogQ = q.bitLength();
-        int rows = n * ceilLogQ;
-        BigInteger[][] inner = new BigInteger[rows][columns];
 
-        return new Matrix(inner);
+        BigInteger[][] inner = new BigInteger[mTrans.getRows()][mTrans.getColumns() * ceilLogQ];
+        for (int row = 0; row < mTrans.getRows(); row++) {
+            for (int col = 0; col < mTrans.getColumns(); col++) {
+                BigInteger[] decompose = Matrix.decompose(mTrans.get(row, col), ceilLogQ).asVector();
+                System.arraycopy(decompose, 0, inner[row], col * ceilLogQ, ceilLogQ);
+            }
+        }
+
+        Matrix transpose = new Matrix(inner).transpose();
+        return transpose;
     }
 
     /**

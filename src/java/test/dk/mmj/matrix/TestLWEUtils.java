@@ -17,7 +17,6 @@ public class TestLWEUtils {
         return Arrays.stream(ints).mapToObj(BigInteger::valueOf).toArray(BigInteger[]::new);
     }
 
-    @Ignore("We may change G impl")
     @Test
     public void createG() {
         int n = 5;
@@ -27,14 +26,13 @@ public class TestLWEUtils {
 
         Matrix expected = new Matrix(new BigInteger[][]{
                 toBigIntArray(new int[]{1, 2, 4, 8, 16, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
-                toBigIntArray(new int[]{0, 1, 2, 4, 8, 16, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
-                toBigIntArray(new int[]{0, 0, 1, 2, 4, 8, 16, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
-                toBigIntArray(new int[]{0, 0, 0, 1, 2, 4, 8, 16, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
-                toBigIntArray(new int[]{0, 0, 0, 0, 1, 2, 4, 8, 16, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+                toBigIntArray(new int[]{0, 0, 0, 0, 0, 0, 1, 2, 4, 8, 16, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
+                toBigIntArray(new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 8, 16, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
+                toBigIntArray(new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 8, 16, 32, 0, 0, 0, 0, 0, 0}),
+                toBigIntArray(new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 8, 16, 32})
         });
 
         assertEquals("Unexpected output", expected, g);
-
     }
 
     @Test
@@ -63,46 +61,18 @@ public class TestLWEUtils {
 
     @Test
     public void testGInverse() {
-        final BigInteger q = new BigInteger(16, new SecureRandom());
-        final BigInteger[] vals = {valueOf(1), valueOf(3), valueOf(7), valueOf(8)};
+        final BigInteger q = valueOf(128);
         int n = 5;
 
-        //BEGIN: DECOMPOSE
-        //Write each value as a decomposed bitstring (row)
-        final BigInteger[][] inner = Arrays.stream(vals)
-                .map(v -> Matrix.decompose(v, q.bitLength()))
-                .map(Matrix::asVector)
-                .toArray(BigInteger[][]::new);
-
-        BigInteger[][] actualInner = new BigInteger[inner.length][n * q.bitLength()];
-        for (int i = 0; i < inner.length; i++) {
-            actualInner[i] = new BigInteger[n * q.bitLength()];
-            Arrays.fill(actualInner[i], ZERO);
-            System.arraycopy(inner[i], 0, actualInner[i], 0, inner[i].length);
-        }
-
-        final Matrix matrix = new Matrix(actualInner).transpose();//We create the matrix, and then write the numbers on columns, instead of rows
-
-        //BEGIN: RECOMPOSE
-        Matrix g1 = LWEUtils.createG(n, q);
-        Matrix g = new Matrix(new BigInteger[][]{LWEUtils.calculateSmallG(n*q.bitLength())});
-
-        final Matrix multiply1 = g1.multiply(matrix, q);
-        Matrix readable = multiply1.transpose();//We transpose, so that numbers are on rows instead of columns - prettier to read
-
-        BigInteger[] row = multiply1.getRow(0);
-        assertEquals("Should be one", ONE, row[0]);
-        assertEquals("Should be three", valueOf(3), row[1]);
-        assertEquals("Should be seven", valueOf(7), row[2]);
-        assertEquals("Should be eight", valueOf(8), row[3]);
-
-        fail("Still not testing the correct thing..");
         final Matrix valMatrix = new Matrix(new BigInteger[][]{
                 {valueOf(1), valueOf(3), valueOf(7), valueOf(8)},
-                {valueOf(11), valueOf(23), valueOf(37), valueOf(48)}
+                {valueOf(11), valueOf(4), valueOf(89), valueOf(122)},
+                {valueOf(21), valueOf(6), valueOf(76), valueOf(99)},
+                {valueOf(41), valueOf(33), valueOf(34), valueOf(46)},
+                {valueOf(51), valueOf(123), valueOf(26), valueOf(38)},
         });
 
-        Matrix gInverse = LWEUtils.calculateGInverse(valMatrix, n, q);
+        Matrix gInverse = LWEUtils.calculateGInverse(valMatrix, q);
         Matrix multiply = LWEUtils.createG(n, q).multiply(gInverse, q);
         assertEquals("Should be back to original", valMatrix, multiply);
 

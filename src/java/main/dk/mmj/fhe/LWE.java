@@ -9,9 +9,7 @@ import dk.mmj.matrix.LWEUtils;
 import dk.mmj.matrix.Matrix;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 import static java.math.BigInteger.*;
 
@@ -103,7 +101,7 @@ public class LWE implements FHE {
 
         Matrix bigG = LWEUtils.createG(n, q);
 
-        Matrix gInverse = LWEUtils.calculateGInverse(c2M, n, q);
+        Matrix gInverse = LWEUtils.calculateGInverse(c2M, q);
         Matrix product = c1M.multiply(gInverse, q);
         Matrix c3 = bigG.subtract(product, q);
         return new LWECiphertext(c3);
@@ -121,15 +119,5 @@ public class LWE implements FHE {
             throw new RuntimeException("Ciphertext must be for LWE system");
         }
         return (LWECiphertext) c;
-    }
-
-    public static void main(String[] args) {
-        int q = 65537;
-        double alpha = 0.000976562500000000;
-
-        SecureRandom secureRandom = new SecureRandom();
-        for (int i = 0; i < 50; i++) {
-            System.out.println("val: " + ((int)(secureRandom.nextGaussian() * alpha*q) % q));
-        }
     }
 }
