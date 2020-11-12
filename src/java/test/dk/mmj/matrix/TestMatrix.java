@@ -30,7 +30,7 @@ public class TestMatrix {
 
         BigInteger roof = valueOf(500);
 
-        Matrix matrix = new Matrix(8, 5, rand, roof);
+        Matrix matrix = new Matrix(8, 5, (q) -> new BigInteger(q.bitCount(), rand).mod(q), roof);
 
         for (int row = 0; row < 8; row++) {
             for (int column = 0; column < 5; column++) {

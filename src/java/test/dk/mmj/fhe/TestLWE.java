@@ -54,7 +54,7 @@ public class TestLWE {
 
     @Test
     public void testNand() {
-        final Boolean[] options = {true, false};
+        final Boolean[] options = {false, true};
 
         final PublicKey pk = keyPair.getPublicKey();
         final SecretKey sk = keyPair.getSecretKey();

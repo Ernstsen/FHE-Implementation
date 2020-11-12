@@ -22,6 +22,29 @@ import static java.math.BigInteger.*;
 public class LWE implements FHE {
     private static final int nFactorToM = 69;//TODO: Is this unsafe to have as constant?
     private final SecureRandom rand = new SecureRandom();
+    @SuppressWarnings("FieldCanBeLocal")//TODO: Will be parameterized later
+    private final double alpha = 0.0009;
+
+    /**
+     * @param q BigInteger q deciding size
+     * @return next gaussian random int with width = alpha*q
+     */
+    private BigInteger nextGaussian(BigInteger q){
+        int qInt = q.intValue();
+        double gaussian = rand.nextGaussian();
+
+        double v = (gaussian * alpha) * qInt;
+
+        return BigInteger.valueOf((long) v).mod(q);
+    }
+
+    /**
+     * @param q BigInteger q deciding size
+     * @return next uniform random int mod q
+     */
+    private BigInteger nextUniform(BigInteger q){
+        return new BigInteger(q.bitLength(), rand).mod(q);
+    }
 
     /**
      * For general documentation see {@link FHE}
@@ -34,11 +57,11 @@ public class LWE implements FHE {
         int n = securityParameter / 16;//Todo: Fix!
         int m = n * nFactorToM;
 
-        Matrix bigB = new Matrix(n, m, rand, q);
+        Matrix bigB = new Matrix(n, m, this::nextUniform, q);
 
-        Matrix t = new Matrix(1, n, rand, q);
+        Matrix t = new Matrix(1, n, this::nextUniform, q);
 
-        Matrix e = new Matrix(1, m, rand, BigInteger.valueOf(n));
+        Matrix e = new Matrix(1, m, this::nextGaussian, BigInteger.valueOf(n));
 
         Matrix b = t.multiply(bigB, q).add(e, q);
 
@@ -58,7 +81,7 @@ public class LWE implements FHE {
         int n = a.getRows();
 
         Matrix bigG = LWEUtils.createG(n, q);
-        Matrix r = new Matrix(a.getColumns(), bigG.getColumns(), rand, BigInteger.valueOf(2));
+        Matrix r = new Matrix(a.getColumns(), bigG.getColumns(), this::nextUniform, BigInteger.valueOf(2));
 
         Matrix multiply = a.multiply(r, q);
 
