@@ -34,6 +34,15 @@ public interface FHE {
     boolean decrypt(Ciphertext c, SecretKey secretKey);
 
     /**
+     * Evaluates not on an encrypted message
+     *
+     * @param c ENC_pk(m1)
+     * @param pk public key for system
+     * @return ENC_pk(not(m1))
+     */
+    Ciphertext not(Ciphertext c, PublicKey pk);
+
+    /**
      * Evaluates nand on two encrypted messages
      *
      * @param c1 ENC_pk(m1)
@@ -42,6 +51,36 @@ public interface FHE {
      * @return ENC_pk(nand ( m1, m2))
      */
     Ciphertext nand(Ciphertext c1, Ciphertext c2, PublicKey pk);
+
+    /**
+     * Evaluates and on two encrypted messages
+     *
+     * @param c1 ENC_pk(m1)
+     * @param c2 ENC_pk(m2)
+     * @param pk public key for system
+     * @return ENC_pk(and ( m1, m2))
+     */
+    Ciphertext and(Ciphertext c1, Ciphertext c2, PublicKey pk);
+
+    /**
+     * Evaluates or on two encrypted messages
+     *
+     * @param c1 ENC_pk(m1)
+     * @param c2 ENC_pk(m2)
+     * @param pk public key for system
+     * @return ENC_pk(or ( m1, m2))
+     */
+    Ciphertext or(Ciphertext c1, Ciphertext c2, PublicKey pk);
+
+    /**
+     * Evaluates exclusive or on two encrypted messages
+     *
+     * @param c1 ENC_pk(m1)
+     * @param c2 ENC_pk(m2)
+     * @param pk public key for system
+     * @return ENC_pk(xor ( m1, m2))
+     */
+    Ciphertext xor(Ciphertext c1, Ciphertext c2, PublicKey pk);
 
     /**
      * Keypair for the fully homomorphic encryption scheme

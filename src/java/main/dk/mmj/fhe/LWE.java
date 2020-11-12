@@ -29,7 +29,7 @@ public class LWE implements FHE {
      * @param q BigInteger q deciding size
      * @return next gaussian random int with width = alpha*q
      */
-    private BigInteger nextGaussian(BigInteger q){
+    private BigInteger nextGaussian(BigInteger q) {
         int qInt = q.intValue();
         double gaussian = rand.nextGaussian();
 
@@ -42,7 +42,7 @@ public class LWE implements FHE {
      * @param q BigInteger q deciding size
      * @return next uniform random int mod q
      */
-    private BigInteger nextUniform(BigInteger q){
+    private BigInteger nextUniform(BigInteger q) {
         return new BigInteger(q.bitLength(), rand).mod(q);
     }
 
@@ -113,21 +113,49 @@ public class LWE implements FHE {
     }
 
     @Override
-    public Ciphertext nand(Ciphertext c1, Ciphertext c2, PublicKey pk) {
+    public Ciphertext not(Ciphertext c, PublicKey pk) {
         LWEPublicKey key = assertOwnKey(pk);
-        Matrix c1M = assertOwnCiphertext(c1).getC();
-        Matrix c2M = assertOwnCiphertext(c2).getC();
+        Matrix c1M = assertOwnCiphertext(c).getC();
 
         Matrix a = key.getKey();
         BigInteger q = key.getQ();
         int n = a.getRows();
 
         Matrix bigG = LWEUtils.createG(n, q);
+        Matrix cRes = bigG.subtract(c1M, q);
+        return new LWECiphertext(cRes);
+    }
+
+    @Override
+    public Ciphertext nand(Ciphertext c1, Ciphertext c2, PublicKey pk) {
+        return not(and(c1, c2, pk), pk);
+    }
+
+    @Override
+    public Ciphertext and(Ciphertext c1, Ciphertext c2, PublicKey pk) {
+        LWEPublicKey key = assertOwnKey(pk);
+        Matrix c1M = assertOwnCiphertext(c1).getC();
+        Matrix c2M = assertOwnCiphertext(c2).getC();
+
+        BigInteger q = key.getQ();
 
         Matrix gInverse = LWEUtils.calculateGInverse(c2M, q);
-        Matrix product = c1M.multiply(gInverse, q);
-        Matrix c3 = bigG.subtract(product, q);
-        return new LWECiphertext(c3);
+        Matrix res = c1M.multiply(gInverse, q);
+        return new LWECiphertext(res);
+    }
+
+    @Override
+    public Ciphertext or(Ciphertext c1, Ciphertext c2, PublicKey pk) {
+        return nand(not(c1, pk), not(c2, pk), pk);
+    }
+
+    @Override
+    public Ciphertext xor(Ciphertext c1, Ciphertext c2, PublicKey pk) {
+        Ciphertext c1Nandc2 = nand(c1, c2, pk);
+        Ciphertext left = nand(c1, c1Nandc2, pk);
+        Ciphertext right = nand(c2, c1Nandc2, pk);
+        
+        return (nand(left, right, pk));
     }
 
     private LWEPublicKey assertOwnKey(PublicKey pk) {

@@ -53,6 +53,23 @@ public class TestLWE {
     }
 
     @Test
+    public void testNot() {
+        final Boolean[] options = {false, true};
+
+        final PublicKey pk = keyPair.getPublicKey();
+        final SecretKey sk = keyPair.getSecretKey();
+
+        for (Boolean m : options) {
+            final Ciphertext c = lwe.encrypt(m, pk);
+            final Ciphertext res = lwe.not(c, pk);
+
+            final boolean decrypt = lwe.decrypt(res, sk);
+
+            assertEquals("Homomorphic NOT did not match result of java NOT", !m, decrypt);
+        }
+    }
+
+    @Test
     public void testNand() {
         final Boolean[] options = {false, true};
 
@@ -68,7 +85,70 @@ public class TestLWE {
 
                 final boolean decrypt = lwe.decrypt(nand, sk);
 
-                assertEquals("Homomorphic NAND did not match result of normal NAND", !(m1 & m2), decrypt);
+                assertEquals("Homomorphic NAND did not match result of java NAND", !(m1 & m2), decrypt);
+            }
+        }
+    }
+
+    @Test
+    public void testAnd() {
+        final Boolean[] options = {false, true};
+
+        final PublicKey pk = keyPair.getPublicKey();
+        final SecretKey sk = keyPair.getSecretKey();
+
+        for (Boolean m1 : options) {
+            for (Boolean m2 : options) {
+
+                final Ciphertext c1 = lwe.encrypt(m1, pk);
+                final Ciphertext c2 = lwe.encrypt(m2, pk);
+                final Ciphertext res = lwe.and(c1, c2, pk);
+
+                final boolean decrypt = lwe.decrypt(res, sk);
+
+                assertEquals("Homomorphic AND did not match result of java AND", (m1 & m2), decrypt);
+            }
+        }
+    }
+
+    @Test
+    public void testOr() {
+        final Boolean[] options = {false, true};
+
+        final PublicKey pk = keyPair.getPublicKey();
+        final SecretKey sk = keyPair.getSecretKey();
+
+        for (Boolean m1 : options) {
+            for (Boolean m2 : options) {
+
+                final Ciphertext c1 = lwe.encrypt(m1, pk);
+                final Ciphertext c2 = lwe.encrypt(m2, pk);
+                final Ciphertext res = lwe.or(c1, c2, pk);
+
+                final boolean decrypt = lwe.decrypt(res, sk);
+
+                assertEquals("Homomorphic OR did not match result of normal OR", (m1 | m2), decrypt);
+            }
+        }
+    }
+
+    @Test
+    public void testXor() {
+        final Boolean[] options = {false, true};
+
+        final PublicKey pk = keyPair.getPublicKey();
+        final SecretKey sk = keyPair.getSecretKey();
+
+        for (Boolean m1 : options) {
+            for (Boolean m2 : options) {
+
+                final Ciphertext c1 = lwe.encrypt(m1, pk);
+                final Ciphertext c2 = lwe.encrypt(m2, pk);
+                final Ciphertext res = lwe.xor(c1, c2, pk);
+
+                final boolean decrypt = lwe.decrypt(res, sk);
+
+                assertEquals("Homomorphic XOR did not match result of normal XOR", (m1 ^ m2), decrypt);
             }
         }
     }
