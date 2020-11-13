@@ -35,7 +35,7 @@ public class LWE implements FHE {
 
         double v = (gaussian * alpha) * qInt;
 
-        return BigInteger.valueOf((long) v).mod(q);
+        return BigInteger.valueOf((long) (v + .5d)).mod(q);
     }
 
     /**
@@ -154,7 +154,7 @@ public class LWE implements FHE {
         Ciphertext c1Nandc2 = nand(c1, c2, pk);
         Ciphertext left = nand(c1, c1Nandc2, pk);
         Ciphertext right = nand(c2, c1Nandc2, pk);
-        
+
         return (nand(left, right, pk));
     }
 
