@@ -9,21 +9,15 @@ import java.util.Objects;
 public class LWESecretKey implements SecretKey {
 
     private final Matrix s;
-    private final Matrix a;
     private final BigInteger q;
 
-    public LWESecretKey(Matrix s, Matrix a, BigInteger q) {
+    public LWESecretKey(Matrix s, BigInteger q) {
         this.s = s;
-        this.a = a;
         this.q = q;
     }
 
     public Matrix getS() {
         return s;
-    }
-
-    public Matrix getA() {
-        return a;
     }
 
     public BigInteger getQ() {

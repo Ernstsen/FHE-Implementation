@@ -68,8 +68,8 @@ public class LWE implements FHE {
         Matrix minusT = t.negate().addColumn(new BigInteger[]{ONE});
         Matrix bigA = bigB.addRow(b.asVector());
         return new KeyPair(
-                new LWESecretKey(minusT, bigA, q),
-                new LWEPublicKey(bigA, q, n)
+                new LWESecretKey(minusT, q),
+                new LWEPublicKey(bigA, q)
         );
     }
 
