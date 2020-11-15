@@ -121,7 +121,7 @@ public class LWEUtils {
         final BigInteger zeroDiff = leftBitValue.subtract(zeroHBitValue).abs();
         final BigInteger oneDiff = leftBitValue.subtract(oneHBitValue).abs();
 
-        //Returns true if oneDiff is larger than or equals to zeroDiff
+        //Returns true if zeroDiff is larger than or equals to oneDiff
         return zeroDiff.compareTo(oneDiff) >= 0;
     }
 }
