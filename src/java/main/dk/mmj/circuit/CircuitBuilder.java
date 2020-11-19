@@ -1,20 +1,35 @@
 package dk.mmj.circuit;
 
+import dk.mmj.fhe.interfaces.Ciphertext;
 import dk.mmj.fhe.interfaces.FHE;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static dk.mmj.circuit.GateBuilder.GateType.*;
 
 public class CircuitBuilder {
     private final FHE fhe;
     private GateBuilder root;
+    private List<Observer> observers = new ArrayList<>();
 
     public CircuitBuilder(FHE fhe) {
         this.fhe = fhe;
     }
 
+    public CircuitBuilder(FHE fhe, List<Observer> observers) {
+        this.fhe = fhe;
+        this.observers.addAll(observers);
+    }
+
+    public CircuitBuilder addObserver(Observer observer) {
+        observers.add(observer);
+        return this;
+    }
+
     public CircuitBuilder not() {
-        root = new GateBuilder(NOT, fhe);
-        CircuitBuilder gb = new CircuitBuilder(fhe);
+        root = new GateBuilder(NOT, fhe, observers);
+        CircuitBuilder gb = new CircuitBuilder(fhe, observers);
         root.setGates(gb);
         return gb;
     }
@@ -45,10 +60,10 @@ public class CircuitBuilder {
     }
 
     private MultipleInputGateBuilder handleGate(GateBuilder.GateType type) {
-        root = new GateBuilder(type, fhe);
+        root = new GateBuilder(type, fhe, observers);
 
-        CircuitBuilder left = new CircuitBuilder(fhe);
-        CircuitBuilder right = new CircuitBuilder(fhe);
+        CircuitBuilder left = new CircuitBuilder(fhe, observers);
+        CircuitBuilder right = new CircuitBuilder(fhe, observers);
         root.setGates(
                 left, right
         );
@@ -60,13 +75,24 @@ public class CircuitBuilder {
     }
 
     public void input(int i) {
-        root = new GateBuilder(INPUT, fhe);
+        root = new GateBuilder(INPUT, fhe, observers);
         root.setInputIndex(i);
     }
 
 
     private interface SingleInputGateBuilder {
         CircuitBuilder gate();
+    }
+
+    /**
+     * ObserverPattern interface for use in Circuits
+     * <br/>
+     * <code>register</code> methods will be called during circuit <b>evaluation</b>
+     */
+    public interface Observer {
+        void register(GateBuilder.GateType type, Ciphertext inputValue, Ciphertext eval);
+
+        void register(GateBuilder.GateType type, Ciphertext leftValue, Ciphertext rightValue, Ciphertext eval);
     }
 
     /**
