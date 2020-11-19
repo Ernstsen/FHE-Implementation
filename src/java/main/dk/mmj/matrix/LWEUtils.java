@@ -128,22 +128,4 @@ public class LWEUtils {
         //Returns true if zeroDiff is larger than or equals to oneDiff
         return zeroDiff.compareTo(oneDiff) >= 0;
     }
-
-    /**
-     * val1 = 6
-     * val2 = 1
-     * mod = 7
-     *
-     * 6 - 1 % 7 = 5
-     * 1-6 % 7 = 2
-     *
-     *
-     * val1=6
-     * val2=5
-     * 6-5 % 7 = 1
-     * 5-6 % = 6
-     *
-     * min(val1-val2%7, val2-val1%7)
-     *
-     */
 }
