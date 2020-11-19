@@ -118,10 +118,32 @@ public class LWEUtils {
         final BigInteger zeroHBitValue = zeroHypothesis.get(0, bitNumber);
         final BigInteger oneHBitValue = oneHypothesis.get(0, bitNumber);
 
-        final BigInteger zeroDiff = leftBitValue.subtract(zeroHBitValue).abs();
-        final BigInteger oneDiff = leftBitValue.subtract(oneHBitValue).abs();
+        final BigInteger zeroDiff = leftBitValue.subtract(zeroHBitValue).mod(modulus).min(
+                zeroHBitValue.subtract(leftBitValue).mod(modulus)
+        );
+        final BigInteger oneDiff = leftBitValue.subtract(oneHBitValue).mod(modulus).min(
+                oneHBitValue.subtract(leftBitValue).mod(modulus)
+        );
 
         //Returns true if zeroDiff is larger than or equals to oneDiff
         return zeroDiff.compareTo(oneDiff) >= 0;
     }
+
+    /**
+     * val1 = 6
+     * val2 = 1
+     * mod = 7
+     *
+     * 6 - 1 % 7 = 5
+     * 1-6 % 7 = 2
+     *
+     *
+     * val1=6
+     * val2=5
+     * 6-5 % 7 = 1
+     * 5-6 % = 6
+     *
+     * min(val1-val2%7, val2-val1%7)
+     *
+     */
 }

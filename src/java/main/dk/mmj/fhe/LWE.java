@@ -23,7 +23,7 @@ public class LWE implements FHE {
     private static final int nFactorToM = 13;//TODO: Is this unsafe to have as constant?
     private final SecureRandom rand = new SecureRandom();
     @SuppressWarnings("FieldCanBeLocal")//TODO: Will be parameterized later
-    private final double alpha = 0.0000000762939453125;
+    private final double alpha = 0.000006;
 
     /**
      * @param q BigInteger q deciding size
