@@ -111,11 +111,11 @@ public class CircuitBuilder {
             this.right = right;
         }
 
-        CircuitBuilder leftGate() {
+        public CircuitBuilder leftGate() {
             return left.gate();
         }
 
-        CircuitBuilder rightGate() {
+        public CircuitBuilder rightGate() {
             return right.gate();
         }
     }
