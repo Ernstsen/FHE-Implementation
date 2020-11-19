@@ -1,5 +1,6 @@
 package dk.mmj;
 
+import dk.mmj.circuit.TestCircuitBuilder;
 import dk.mmj.fhe.TestLWE;
 import dk.mmj.fhe.TestLWECircuits;
 import dk.mmj.matrix.TestLWEUtils;
@@ -15,7 +16,10 @@ import org.junit.runners.Suite;
         TestLWECircuits.class,
 
         //Matrix
-        TestMatrix.class
+        TestMatrix.class,
+
+        //Circuit
+        TestCircuitBuilder.class
 })
 public class TestSuite {
 }
