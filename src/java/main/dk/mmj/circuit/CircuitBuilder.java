@@ -6,7 +6,7 @@ import dk.mmj.fhe.interfaces.FHE;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dk.mmj.circuit.GateBuilder.GateType.*;
+import static dk.mmj.circuit.GateType.*;
 
 public class CircuitBuilder {
     private final FHE fhe;
@@ -59,7 +59,7 @@ public class CircuitBuilder {
         return root.build()::evaluate;
     }
 
-    private MultipleInputGateBuilder handleGate(GateBuilder.GateType type) {
+    private MultipleInputGateBuilder handleGate(GateType type) {
         root = new GateBuilder(type, fhe, observers);
 
         CircuitBuilder left = new CircuitBuilder(fhe, observers);
@@ -90,9 +90,9 @@ public class CircuitBuilder {
      * <code>register</code> methods will be called during circuit <b>evaluation</b>
      */
     public interface Observer {
-        void register(GateBuilder.GateType type, Ciphertext inputValue, Ciphertext eval);
+        void register(GateType type, Ciphertext inputValue, Ciphertext eval);
 
-        void register(GateBuilder.GateType type, Ciphertext leftValue, Ciphertext rightValue, Ciphertext eval);
+        void register(GateType type, Ciphertext leftValue, Ciphertext rightValue, Ciphertext eval);
     }
 
     /**
