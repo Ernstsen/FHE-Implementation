@@ -20,10 +20,10 @@ import static java.math.BigInteger.*;
  * Zvika Brakerski (Electronic Colloquium on Computational Complexity, Report No. 125 (2018)) </i>
  */
 public class LWE implements FHE {
-    private static final int nFactorToM = 69;//TODO: Is this unsafe to have as constant?
+    private static final int nFactorToM = 13;//TODO: Is this unsafe to have as constant?
     private final SecureRandom rand = new SecureRandom();
     @SuppressWarnings("FieldCanBeLocal")//TODO: Will be parameterized later
-    private final double alpha = 0.0009;
+    private final double alpha = 0.0000000762939453125;
 
     /**
      * @param q BigInteger q deciding size
@@ -53,15 +53,15 @@ public class LWE implements FHE {
      * @return keypair
      */
     public KeyPair generateKey(int securityParameter) {
-        BigInteger q = new BigInteger(securityParameter, rand);
-        int n = securityParameter / 16;//Todo: Fix!
+        BigInteger q = BigInteger.valueOf(1048576);
+        int n = 16;
         int m = n * nFactorToM;
 
         Matrix bigB = new Matrix(n, m, this::nextUniform, q);
 
         Matrix t = new Matrix(1, n, this::nextUniform, q);
 
-        Matrix e = new Matrix(1, m, this::nextGaussian, BigInteger.valueOf(n));
+        Matrix e = new Matrix(1, m, this::nextGaussian, q);
 
         Matrix b = t.multiply(bigB, q).add(e, q);
 
