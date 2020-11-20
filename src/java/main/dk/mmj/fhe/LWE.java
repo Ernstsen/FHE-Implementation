@@ -24,7 +24,7 @@ public class LWE implements FHE {
     private static final int nFactorToM = 1;//TODO: Is this unsafe to have as constant?
     private final SecureRandom rand = new SecureRandom();
     @SuppressWarnings("FieldCanBeLocal")//TODO: Will be parameterized later
-    private final double alpha = 0.0000012;
+    private final double alpha = 0.0000024;
 
     /**
      * @param q BigInteger q deciding size
@@ -36,7 +36,8 @@ public class LWE implements FHE {
 
         double v = gaussian * (alpha * qInt);
 
-        return BigInteger.valueOf((long) (v + .5d)).mod(q);
+        long vRounded = v> 0 ? ((long) (v + .5d)) : ((long) (v - .5d));
+        return BigInteger.valueOf(vRounded).mod(q);
     }
 
     /**
@@ -56,7 +57,7 @@ public class LWE implements FHE {
     public KeyPair generateKey(int securityParameter) {
         int val = 1000003;
         BigInteger q = BigInteger.valueOf(val);
-        int n = 16;
+        int n = 2;
         int m = n * nFactorToM;
 
         Matrix bigB = new Matrix(n, m, this::nextUniform, q);
@@ -150,11 +151,7 @@ public class LWE implements FHE {
 
     @Override
     public Ciphertext or(Ciphertext c1, Ciphertext c2, PublicKey pk) {
-        Matrix left = assertOwnCiphertext(c1).getC();
-        Matrix right = assertOwnCiphertext(c2).getC();
-        LWEPublicKey publicKey = assertOwnKey(pk);
-
-        return new LWECiphertext(left.add(right, publicKey.getQ()));
+        return nand(not(c1, pk), not(c2, pk), pk);
     }
 
     @Override
