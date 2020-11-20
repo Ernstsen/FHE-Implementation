@@ -21,7 +21,7 @@ public class LWEBenchmarkUtils {
      * @param value      the value for which <code> value = DEC(ciphertext) </code>
      * @return the noise contained in the ciphertext
      */
-    BigInteger calculateNoise(LWECiphertext ciphertext, LWESecretKey sk, boolean value) {
+    public static BigInteger calculateNoise(LWECiphertext ciphertext, LWESecretKey sk, boolean value) {
         Matrix s = sk.getS();
         BigInteger q = sk.getQ();
         Matrix c = ciphertext.getC();
@@ -33,8 +33,11 @@ public class LWEBenchmarkUtils {
         BigInteger leftBitValue = sC.get(0,0);
 
         final Matrix hypothesis = sG.multiply(value ? ONE : ZERO, q);
+        BigInteger zeroHBitValue = hypothesis.get(0, 0);
 
-        return leftBitValue.subtract(hypothesis.get(0,0)).abs();
+        return leftBitValue.subtract(zeroHBitValue).mod(q).min(
+                zeroHBitValue.subtract(leftBitValue).mod(q)
+        );
     }
 
 }

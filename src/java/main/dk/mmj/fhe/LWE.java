@@ -33,7 +33,7 @@ public class LWE implements FHE {
         int qInt = q.intValue();
         double gaussian = rand.nextGaussian();
 
-        double v = (gaussian * alpha) * qInt;
+        double v = gaussian * (alpha * qInt);
 
         return BigInteger.valueOf((long) (v + .5d)).mod(q);
     }

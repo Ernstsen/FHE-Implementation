@@ -92,7 +92,7 @@ public class CircuitBuilder {
     public interface Observer {
         void register(GateType type, Ciphertext inputValue, Ciphertext eval);
 
-        void register(GateType type, Ciphertext leftValue, Ciphertext rightValue, Ciphertext eval);
+        void register(GateType type, Ciphertext leftValue, Ciphertext rightValue, Ciphertext eval, String comment);
     }
 
     /**

@@ -70,6 +70,7 @@ class GateBuilder {
 
             Ciphertext eval = func.eval(leftInput, rightInput, pk);
             registerWithObservers(type, leftInput, rightInput, eval);
+            registerWithObservers(type, leftInput, rightInput, func.eval(rightInput, leftInput, pk), "RevInput");
             return eval;
         };
     }
@@ -114,9 +115,22 @@ class GateBuilder {
      * @param eval       the result of the evaluation
      */
     private void registerWithObservers(GateType type, Ciphertext leftValue, Ciphertext rightValue, Ciphertext eval) {
+        registerWithObservers(type, leftValue, rightValue, eval, "");
+    }
+
+    /**
+     * Registers usage of gate with indegree two, with observers
+     *
+     * @param type       type of gate
+     * @param leftValue  left input gate
+     * @param rightValue right input gate
+     * @param eval       the result of the evaluation
+     * @param comment    comment to be suffixed
+     */
+    private void registerWithObservers(GateType type, Ciphertext leftValue, Ciphertext rightValue, Ciphertext eval, String comment) {
         try {
             for (CircuitBuilder.Observer observer : observers) {
-                observer.register(type, leftValue, rightValue, eval);
+                observer.register(type, leftValue, rightValue, eval, comment);
             }
         } catch (Throwable t) {
             t.printStackTrace();
