@@ -21,10 +21,10 @@ import static java.math.BigInteger.*;
  * Zvika Brakerski (Electronic Colloquium on Computational Complexity, Report No. 125 (2018)) </i>
  */
 public class LWE implements FHE {
-    private static final int nFactorToM = 13;//TODO: Is this unsafe to have as constant?
+    private static final int nFactorToM = 1;//TODO: Is this unsafe to have as constant?
     private final SecureRandom rand = new SecureRandom();
     @SuppressWarnings("FieldCanBeLocal")//TODO: Will be parameterized later
-    private final double alpha = 0.000003;
+    private final double alpha = 0.0000012;
 
     /**
      * @param q BigInteger q deciding size
@@ -54,7 +54,7 @@ public class LWE implements FHE {
      * @return keypair
      */
     public KeyPair generateKey(int securityParameter) {
-        int val = 1048576;
+        int val = 1000003;
         BigInteger q = BigInteger.valueOf(val);
         int n = 16;
         int m = n * nFactorToM;
@@ -123,11 +123,9 @@ public class LWE implements FHE {
         LWEPublicKey key = assertOwnKey(pk);
         Matrix c1M = assertOwnCiphertext(c).getC();
 
-        Matrix a = key.getKey();
         BigInteger q = key.getQ();
-        int n = a.getRows();
 
-        Matrix bigG = LWEUtils.createG(n, q);
+        Matrix bigG = LWEUtils.createG(c1M.getRows(), q);
         Matrix cRes = bigG.subtract(c1M, q);
         return new LWECiphertext(cRes);
     }
@@ -152,16 +150,19 @@ public class LWE implements FHE {
 
     @Override
     public Ciphertext or(Ciphertext c1, Ciphertext c2, PublicKey pk) {
-        return nand(not(c1, pk), not(c2, pk), pk);
+        Matrix left = assertOwnCiphertext(c1).getC();
+        Matrix right = assertOwnCiphertext(c2).getC();
+        LWEPublicKey publicKey = assertOwnKey(pk);
+
+        return new LWECiphertext(left.add(right, publicKey.getQ()));
     }
 
     @Override
     public Ciphertext xor(Ciphertext c1, Ciphertext c2, PublicKey pk) {
-        Ciphertext c1Nandc2 = nand(c1, c2, pk);
-        Ciphertext left = nand(c1, c1Nandc2, pk);
-        Ciphertext right = nand(c2, c1Nandc2, pk);
+        Ciphertext left = not(and(c1, c2, pk), pk);
+        Ciphertext right = or(c1, c2, pk);
 
-        return (nand(left, right, pk));
+        return and(left, right, pk);
     }
 
     private LWEPublicKey assertOwnKey(PublicKey pk) {
