@@ -48,6 +48,66 @@ public class NoiseBenchmarkRunner {
 
         observer.log();
     }
+    @Test
+    public void benchmarkNoiseXor() {
+        LWE lwe = new LWE();
+        FHE.KeyPair keyPair = lwe.generateKey(128);
+
+        NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
+
+        CircuitBuilder cb = new CircuitBuilder(lwe).addObserver(observer);
+
+        CircuitBuilder.MultipleInputGateBuilder and = cb.xor();
+        and.leftGate().input(0);
+        and.rightGate().input(1);
+
+        Circuit circuit = cb.build();
+
+        for (boolean[] booleans : permutations2()) {
+            Ciphertext[] ciphertexts = {
+                    lwe.encrypt(booleans[0], keyPair.getPublicKey()),
+                    lwe.encrypt(booleans[1], keyPair.getPublicKey())
+            };
+
+            Ciphertext valC = circuit.evaluate(keyPair.getPublicKey(), ciphertexts);
+            boolean decrypt = lwe.decrypt(valC, keyPair.getSecretKey());
+            assertEquals("Decryption failed - noise was too high!: ", (booleans[0] ^ booleans[1]), decrypt);
+        }
+
+        observer.log();
+    }
+
+    @Test
+    public void benchmarkNoiseAndWithThreeInpus() {
+        LWE lwe = new LWE();
+        FHE.KeyPair keyPair = lwe.generateKey(128);
+
+        NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
+
+        CircuitBuilder cb = new CircuitBuilder(lwe).addObserver(observer);
+
+        CircuitBuilder.MultipleInputGateBuilder and = cb.and();
+        and.leftGate().input(0);
+        CircuitBuilder.MultipleInputGateBuilder secondAnd = and.rightGate().and();
+        secondAnd.leftGate().input(1);
+        secondAnd.rightGate().input(2);
+
+        Circuit circuit = cb.build();
+
+        for (boolean[] booleans : permutations3()) {
+            Ciphertext[] ciphertexts = {
+                    lwe.encrypt(booleans[0], keyPair.getPublicKey()),
+                    lwe.encrypt(booleans[1], keyPair.getPublicKey()),
+                    lwe.encrypt(booleans[2], keyPair.getPublicKey())
+            };
+
+            Ciphertext valC = circuit.evaluate(keyPair.getPublicKey(), ciphertexts);
+            boolean decrypt = lwe.decrypt(valC, keyPair.getSecretKey());
+            assertEquals("Decryption failed - noise was too high!: ", (booleans[0] & booleans[1] & booleans[2]), decrypt);
+        }
+
+        observer.log();
+    }
 
     boolean[][] permutations2() {
         return new boolean[][]{
@@ -55,6 +115,18 @@ public class NoiseBenchmarkRunner {
                 {true, false},
                 {false, true},
                 {false, false},
+        };
+    }
+    boolean[][] permutations3() {
+        return new boolean[][]{
+                {false, true, true},
+                {false, true, false},
+                {false, false, true},
+                {false, false, false},
+                {true, true, true},
+                {true, true, false},
+                {true, false, true},
+                {true, false, false},
         };
     }
 
@@ -126,7 +198,7 @@ public class NoiseBenchmarkRunner {
         private final LWESecretKey sk;
 
         public NoiseObserver(SecretKey sk, LWE lwe) {
-            logLines.add("Type\tEvalNoise\tEvalNoiseRev\tLeftInputNoise\tRightInputNoise\n");
+            logLines.add("Type\tEvalNoise\tLeftInputNoise\tRightInputNoise\tComment\n");
             this.sk = (LWESecretKey) sk;
             this.lwe = lwe;
         }

@@ -10,6 +10,7 @@ import dk.mmj.matrix.Matrix;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.stream.IntStream;
 
 import static java.math.BigInteger.*;
 
@@ -23,7 +24,7 @@ public class LWE implements FHE {
     private static final int nFactorToM = 13;//TODO: Is this unsafe to have as constant?
     private final SecureRandom rand = new SecureRandom();
     @SuppressWarnings("FieldCanBeLocal")//TODO: Will be parameterized later
-    private final double alpha = 0.0000003;
+    private final double alpha = 0.000003;
 
     /**
      * @param q BigInteger q deciding size
@@ -53,7 +54,8 @@ public class LWE implements FHE {
      * @return keypair
      */
     public KeyPair generateKey(int securityParameter) {
-        BigInteger q = BigInteger.valueOf(1048576);
+        int val = 1048576;
+        BigInteger q = BigInteger.valueOf(val);
         int n = 16;
         int m = n * nFactorToM;
 
@@ -65,7 +67,7 @@ public class LWE implements FHE {
 
         Matrix b = t.multiply(bigB, q).add(e, q);
 
-        Matrix minusT = t.negate().addColumn(new BigInteger[]{ONE});
+        Matrix minusT = t.negate(q).addColumn(new BigInteger[]{ONE});
         Matrix bigA = bigB.addRow(b.asVector());
         return new KeyPair(
                 new LWESecretKey(minusT, q),
@@ -109,7 +111,11 @@ public class LWE implements FHE {
         final Matrix bigG = LWEUtils.createG(s.getColumns(), q);
         final Matrix sG = s.multiply(bigG, q);
 
-        return LWEUtils.readBit(sC, sG, q, 0);
+        long trueVotes = IntStream.range(0, sC.getColumns()).parallel()
+                .mapToObj(i -> LWEUtils.readBit(sC, sG, q, i))
+                .filter(Boolean.TRUE::equals).count();
+
+        return trueVotes > (sC.getColumns() / 2);
     }
 
     @Override

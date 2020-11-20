@@ -285,12 +285,12 @@ public class Matrix {
         return new Matrix(res);
     }
 
-    public Matrix negate() {
+    public Matrix negate(BigInteger q) {
         BigInteger[][] res = new BigInteger[nrOfRows][nrOfCols];
 
         for (int row = 0; row < nrOfRows; row++) {
             for (int col = 0; col < nrOfCols; col++) {
-                res[row][col] = inner[row][col].negate();
+                res[row][col] = inner[row][col].negate().mod(q);
             }
         }
 

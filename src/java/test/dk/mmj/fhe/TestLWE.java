@@ -148,7 +148,11 @@ public class TestLWE {
 
                 final boolean decrypt = lwe.decrypt(res, sk);
 
-                assertEquals("Homomorphic XOR did not match result of normal XOR", (m1 ^ m2), decrypt);
+                assertEquals(
+                        "Homomorphic XOR did not match result of normal XOR values: m1=" + m1 + ", m2=" + m2,
+                        (m1 ^ m2),
+                        decrypt
+                );
             }
         }
     }

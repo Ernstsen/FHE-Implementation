@@ -128,13 +128,13 @@ public class TestMatrix {
                 {valueOf(-5), valueOf(8), valueOf(9)},
         };
         Matrix matrix = new Matrix(inner);
-        Matrix res = matrix.negate();
+        Matrix res = matrix.negate(MODULO);
 
 
         for (int row = 0; row < matrix.getRows(); row++) {
             for (int col = 0; col < matrix.getColumns(); col++) {
                 assertEquals("Value was not negated. row=" + row + ", column=" + col,
-                        matrix.get(row, col).negate(), res.get(row, col));
+                        matrix.get(row, col).negate().mod(MODULO), res.get(row, col));
             }
         }
     }

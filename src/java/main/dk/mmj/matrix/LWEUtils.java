@@ -110,7 +110,7 @@ public class LWEUtils {
      */
     public static boolean readBit(Matrix sc, Matrix sg,
                                   BigInteger modulus, int bitNumber) {
-        final BigInteger leftBitValue = sc.get(0, 0);
+        final BigInteger leftBitValue = sc.get(0, bitNumber);
 
         final Matrix zeroHypothesis = sg.multiply(ZERO, modulus);
         final Matrix oneHypothesis = sg.multiply(ONE, modulus);
