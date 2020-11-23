@@ -57,7 +57,7 @@ public class LWE implements FHE {
     public KeyPair generateKey(int securityParameter) {
         int val = 1000003;
         BigInteger q = BigInteger.valueOf(val);
-        int n = 2;
+        int n = 3;
         int m = n * nFactorToM;
 
         Matrix bigB = new Matrix(n, m, this::nextUniform, q);

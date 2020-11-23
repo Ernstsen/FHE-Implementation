@@ -16,14 +16,14 @@ import static java.math.BigInteger.ZERO;
  * Utility class for different type of benchmarks on the cryptosystem
  */
 public class LWEBenchmarkUtils {
-    private final Matrix s;
+    private final Matrix xsG;
     private final BigInteger q;
-    private final Matrix c;
+    private final Matrix sC;
 
-    private LWEBenchmarkUtils(Matrix s, BigInteger q, Matrix c) {
-        this.s = s;
+    private LWEBenchmarkUtils(Matrix xsG, BigInteger q, Matrix sC) {
+        this.xsG = xsG;
         this.q = q;
-        this.c = c;
+        this.sC = sC;
     }
 
     /**
@@ -34,10 +34,17 @@ public class LWEBenchmarkUtils {
      */
     public static BigInteger calculateNoise(LWECiphertext ciphertext, LWESecretKey sk, boolean value) {
         Matrix c = ciphertext.getC();
-        LWEBenchmarkUtils util = new LWEBenchmarkUtils(sk.getS(), sk.getQ(), c);
+        Matrix s = sk.getS();
+        BigInteger q = sk.getQ();
+        final Matrix bigG = LWEUtils.createG(s.getColumns(), q);
+        final Matrix sG = s.multiply(bigG, q);
+        final Matrix sC = s.multiply(c, q);
+        final Matrix xsG = sG.multiply(value ? ONE : ZERO, q);
+
+        LWEBenchmarkUtils util = new LWEBenchmarkUtils(xsG, q, sC);
 
         Optional<BigInteger> reduce = IntStream.range(0, c.getColumns()).parallel()
-                .mapToObj(i -> util.calculateNoiseSingle(i, value))
+                .mapToObj(util::calculateNoiseSingle)
                 .reduce(BigInteger::max);
 
         return reduce.orElse(null);
@@ -46,18 +53,11 @@ public class LWEBenchmarkUtils {
 
     /**
      * @param index index to be read, and have its noise calculated
-     * @param value the value for which <code> value = DEC(ciphertext) </code>
      * @return the noise contained in the ciphertext
      */
-    private BigInteger calculateNoiseSingle(int index, boolean value) {
-        final Matrix bigG = LWEUtils.createG(s.getColumns(), q);
-        final Matrix sG = s.multiply(bigG, q);
-        final Matrix sC = s.multiply(c, q);
-
+    private BigInteger calculateNoiseSingle(int index) {
         BigInteger leftBitValue = sC.get(0, index);
-
-        final Matrix hypothesis = sG.multiply(value ? ONE : ZERO, q);
-        BigInteger zeroHBitValue = hypothesis.get(0, index);
+        BigInteger zeroHBitValue = xsG.get(0, index);
 
         return leftBitValue.subtract(zeroHBitValue).mod(q).min(
                 zeroHBitValue.subtract(leftBitValue).mod(q)
