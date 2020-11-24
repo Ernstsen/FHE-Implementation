@@ -5,15 +5,15 @@ import java.util.Objects;
 /**
  * Fully Homomorphic Encryption
  */
-public interface FHE {
+public interface FHE <ParameterClass extends FHE.Parameters> {
 
     /**
      * Generates a keypair for the encryption scheme
      *
-     * @param securityParameter decides how secure the scheme is - often as the size of the keys
+     * @param parameters Is scheme-specific. Often decides key-size modulus etc.
      * @return a {@link KeyPair}
      */
-    KeyPair generateKey(int securityParameter);
+    KeyPair generateKey(ParameterClass parameters);
 
     /**
      * Encrypts a message under the secret key
@@ -115,5 +115,9 @@ public interface FHE {
         public int hashCode() {
             return Objects.hash(secretKey, publicKey);
         }
+    }
+
+    interface Parameters {
+
     }
 }

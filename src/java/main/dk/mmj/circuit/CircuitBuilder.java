@@ -9,15 +9,15 @@ import java.util.List;
 import static dk.mmj.circuit.GateType.*;
 
 public class CircuitBuilder {
-    private final FHE fhe;
+    private final FHE<?> fhe;
     private GateBuilder root;
     private final List<Observer> observers = new ArrayList<>();
 
-    public CircuitBuilder(FHE fhe) {
+    public CircuitBuilder(FHE<?> fhe) {
         this.fhe = fhe;
     }
 
-    public CircuitBuilder(FHE fhe, List<Observer> observers) {
+    public CircuitBuilder(FHE<?> fhe, List<Observer> observers) {
         this.fhe = fhe;
         this.observers.addAll(observers);
     }

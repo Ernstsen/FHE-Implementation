@@ -6,6 +6,7 @@ import dk.mmj.circuit.CircuitBuilder;
 import dk.mmj.circuit.GateType;
 import dk.mmj.fhe.LWE;
 import dk.mmj.fhe.LWECiphertext;
+import dk.mmj.fhe.LWEParameters;
 import dk.mmj.fhe.LWESecretKey;
 import dk.mmj.fhe.interfaces.Ciphertext;
 import dk.mmj.fhe.interfaces.FHE;
@@ -19,11 +20,12 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class NoiseBenchmarkRunner {
+    private final LWEParameters params = new LWEParameters();
 
     @Test
     public void benchmarkNoiseAnd() {
         LWE lwe = new LWE();
-        FHE.KeyPair keyPair = lwe.generateKey(128);
+        FHE.KeyPair keyPair = lwe.generateKey(new LWEParameters());
 
         NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
 
@@ -52,7 +54,7 @@ public class NoiseBenchmarkRunner {
     @Test
     public void benchmarkNoiseNand() {
         LWE lwe = new LWE();
-        FHE.KeyPair keyPair = lwe.generateKey(128);
+        FHE.KeyPair keyPair = lwe.generateKey(params);
 
         NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
 
@@ -81,7 +83,7 @@ public class NoiseBenchmarkRunner {
     @Test
     public void benchmarkNoiseXor() {
         LWE lwe = new LWE();
-        FHE.KeyPair keyPair = lwe.generateKey(128);
+        FHE.KeyPair keyPair = lwe.generateKey(params);
 
         NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
 
@@ -110,7 +112,7 @@ public class NoiseBenchmarkRunner {
     @Test
     public void benchmarkNoiseOr() {
         LWE lwe = new LWE();
-        FHE.KeyPair keyPair = lwe.generateKey(128);
+        FHE.KeyPair keyPair = lwe.generateKey(params);
 
         NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
 
@@ -139,7 +141,7 @@ public class NoiseBenchmarkRunner {
     @Test
     public void benchmarkNoiseAndWithThreeInpus() {
         LWE lwe = new LWE();
-        FHE.KeyPair keyPair = lwe.generateKey(128);
+        FHE.KeyPair keyPair = lwe.generateKey(params);
 
         NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
 
@@ -171,7 +173,7 @@ public class NoiseBenchmarkRunner {
     @Test
     public void benchmarkNoiseNot() {
         LWE lwe = new LWE();
-        FHE.KeyPair keyPair = lwe.generateKey(128);
+        FHE.KeyPair keyPair = lwe.generateKey(params);
 
         NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
 
@@ -218,7 +220,7 @@ public class NoiseBenchmarkRunner {
     @Test
     public void testCircuitEvaluatesCorrectly() {
         LWE lwe = new LWE();
-        FHE.KeyPair keyPair = lwe.generateKey(128);
+        FHE.KeyPair keyPair = lwe.generateKey(params);
         NoiseObserver observer = new NoiseObserver(keyPair.getSecretKey(), lwe);
 
         CircuitBuilder cb = new CircuitBuilder(lwe).addObserver(observer);

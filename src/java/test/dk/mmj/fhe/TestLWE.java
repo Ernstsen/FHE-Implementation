@@ -11,20 +11,20 @@ import static org.junit.Assert.*;
 
 @SuppressWarnings("ConstantConditions")
 public class TestLWE {
-    private final int securityParameter = 64;
-    private FHE lwe;
+    private final LWEParameters params = new LWEParameters();
+    private LWE lwe;
     private FHE.KeyPair keyPair;
 
     @Before
     public void setup() {
         lwe = new LWE();
-        keyPair = lwe.generateKey(securityParameter);
+        keyPair = lwe.generateKey(params);
         assertNotNull(keyPair);
     }
 
     @Test
     public void testKeyGeneration() {
-        FHE.KeyPair keyPair2 = lwe.generateKey(securityParameter);
+        FHE.KeyPair keyPair2 = lwe.generateKey(params);
 
         assertNotNull(keyPair2);
         assertNotEquals(

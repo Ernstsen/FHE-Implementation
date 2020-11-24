@@ -22,12 +22,12 @@ public class TestLWECircuits {
     PublicKey pk;
     SecretKey sk;
     CircuitGenerator gen;
-    FHE fhe;
+    LWE fhe;
 
     @Before
     public void setup() {
         fhe = new LWE();
-        FHE.KeyPair keyPair = fhe.generateKey(64);
+        FHE.KeyPair keyPair = fhe.generateKey(new LWEParameters());
         pk = keyPair.getPublicKey();
         sk = keyPair.getSecretKey();
 

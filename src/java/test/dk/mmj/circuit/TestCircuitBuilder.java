@@ -66,10 +66,10 @@ public class TestCircuitBuilder {
         return res;
     }
 
-    static class PlaintextFHE implements FHE {
+    static class PlaintextFHE implements FHE<Params> {
 
         @Override
-        public KeyPair generateKey(int securityParameter) {
+        public KeyPair generateKey(Params securityParameter) {
             return null;
         }
 
@@ -119,6 +119,10 @@ public class TestCircuitBuilder {
         public PlaintextCiphertext(boolean value) {
             this.value = value;
         }
+    }
+
+    static class Params implements FHE.Parameters{
+
     }
 
 }

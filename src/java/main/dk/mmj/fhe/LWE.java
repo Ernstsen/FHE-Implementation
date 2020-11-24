@@ -20,11 +20,9 @@ import static java.math.BigInteger.*;
  * Naming is greatly inspired by the paper <i>Fundamentals of Fully Homomorphic Encryption – A Survey,
  * Zvika Brakerski (Electronic Colloquium on Computational Complexity, Report No. 125 (2018)) </i>
  */
-public class LWE implements FHE {
-    private static final int nFactorToM = 1;//TODO: Is this unsafe to have as constant?
+public class LWE implements FHE<LWEParameters> {
     private final SecureRandom rand = new SecureRandom();
-    @SuppressWarnings("FieldCanBeLocal")//TODO: Will be parameterized later
-    private final double alpha = 0.0000024;
+    private double alpha;
 
     /**
      * @param q BigInteger q deciding size
@@ -51,14 +49,14 @@ public class LWE implements FHE {
     /**
      * For general documentation see {@link FHE}
      *
-     * @param securityParameter in this case n
+     * @param parameters in this case n, q, m and alpha
      * @return keypair
      */
-    public KeyPair generateKey(int securityParameter) {
-        int val = 1000003;
-        BigInteger q = BigInteger.valueOf(val);
-        int n = 3;
-        int m = n * nFactorToM;
+    public KeyPair generateKey(LWEParameters parameters) {
+        this.alpha = parameters.getAlpha();
+        BigInteger q = BigInteger.valueOf(parameters.getQ());
+        int n = parameters.getN();
+        int m = parameters.getM();
 
         Matrix bigB = new Matrix(n, m, this::nextUniform, q);
 
