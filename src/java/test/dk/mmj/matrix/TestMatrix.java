@@ -140,6 +140,20 @@ public class TestMatrix {
     }
 
     @Test
+    public void testGetRow(){
+        BigInteger[] row1 = {valueOf(1), valueOf(4), valueOf(5)};
+        BigInteger[] row2 = {valueOf(-5), valueOf(8), valueOf(9)};
+        BigInteger[][] inner = {
+                row1,
+                row2,
+        };
+        Matrix matrix = new Matrix(inner);
+
+        assertArrayEquals("First row did not match ", row1, matrix.getRow(0));
+        assertArrayEquals("Second row did not match ", row2, matrix.getRow(1));
+    }
+
+    @Test
     public void testMatrixMultiplication() {
         BigInteger[][] innerA = {
                 {valueOf(8), valueOf(6)},
