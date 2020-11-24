@@ -14,9 +14,10 @@ import java.util.List;
 class GateBuilder {
     private final FHE fhe;
     private final List<CircuitBuilder.Observer> observers;
-    GateType type;
-    CircuitBuilder[] inputGates;
-    int input;
+    private final GateType type;
+    private CircuitBuilder[] inputGates;
+    private int input;
+    private int depth = -1;
 
     GateBuilder(GateType type, FHE fhe, List<CircuitBuilder.Observer> observers) {
         this.type = type;
@@ -25,29 +26,49 @@ class GateBuilder {
         this.observers = observers;
     }
 
-    Gate build() {
+    Gate build(CircuitBuilder.DepthCounter cnt) {
         Gate left = null;
         Gate right = null;
+        int leftDepth = 0, rightDepth = 0;
+        DepthCounterImpl dc = new DepthCounterImpl();
         if (inputGates.length > 0) {
-            left = inputGates[0].gateBuild();
+            left = inputGates[0].gateBuild(dc);
+            leftDepth = dc.depth;
+            System.out.printf("leftDepth: %d\n", leftDepth);
         }
 
         if (inputGates.length > 1) {
-            right = inputGates[1].gateBuild();
+            right = inputGates[1].gateBuild(dc);
+            rightDepth = dc.depth;
+            System.out.printf("rightDepth: %d\n", rightDepth);
         }
+
+        if(leftDepth > rightDepth){
+            Gate tmp = left;
+            left = right;
+            right = tmp;
+        }
+
+        depth = Math.max(leftDepth, rightDepth);
 
         switch (type) {
             case NOT:
+                cnt.registerDepth(depth);
                 return evaluate(type, fhe::not, left);
             case OR:
+                cnt.registerDepth(depth + 1);
                 return evaluate(type, fhe::or, left, right);
             case AND:
+                cnt.registerDepth(depth + 1);
                 return evaluate(type, fhe::and, left, right);
             case NAND:
+                cnt.registerDepth(depth + 1);
                 return evaluate(type, fhe::nand, left, right);
             case XOR:
+                cnt.registerDepth(depth + 2);
                 return evaluate(type, fhe::xor, left, right);
             case INPUT:
+                cnt.registerDepth(depth);
                 return (pk, inputArray) -> inputArray[input];
             default:
                 throw new RuntimeException("Invalid type");
@@ -143,6 +164,16 @@ class GateBuilder {
 
     private interface IndegreeOneFunction {
         Ciphertext eval(Ciphertext input, PublicKey pk);
+    }
+
+
+
+    class DepthCounterImpl implements CircuitBuilder.DepthCounter {
+        int depth = 0;
+
+        public void registerDepth(int depth) {
+            this.depth = depth;
+        }
     }
 
 }

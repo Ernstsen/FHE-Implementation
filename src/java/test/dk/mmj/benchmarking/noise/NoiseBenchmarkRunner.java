@@ -250,9 +250,10 @@ public class NoiseBenchmarkRunner {
             boolean actual = lwe.decrypt(actualC, keyPair.getSecretKey());
 
             assertEquals("Circuit did not match expected output", expected, actual);
+            observer.log();
+            observer.reset();
         }
 
-        observer.log();
     }
 
     private boolean[][] allPermutations5(){
@@ -286,6 +287,11 @@ public class NoiseBenchmarkRunner {
             logLines.add("Type\tEvalNoise\tLeftInputNoise\tRightInputNoise\tComment\n");
             this.sk = (LWESecretKey) sk;
             this.lwe = lwe;
+        }
+
+        private void reset(){
+            logLines.clear();
+            logLines.add("Type\tEvalNoise\tLeftInputNoise\tRightInputNoise\tComment\n");
         }
 
         @Override

@@ -11,7 +11,9 @@ import static dk.mmj.circuit.GateType.*;
 public class CircuitBuilder {
     private final FHE fhe;
     private GateBuilder root;
-    private List<Observer> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
+    private int depth = 0;
+    private GateType type;
 
     public CircuitBuilder(FHE fhe) {
         this.fhe = fhe;
@@ -50,16 +52,19 @@ public class CircuitBuilder {
         return handleGate(XOR);
     }
 
-    Gate gateBuild() {
-        return root.build();
+    Gate gateBuild(DepthCounter cnt) {
+        return root.build(cnt);
     }
 
 
     public Circuit build() {
-        return root.build()::evaluate;
+        return root.build((i) ->{
+            System.out.printf("Circuit with depth: %d has been built", i);
+        })::evaluate;
     }
 
     private MultipleInputGateBuilder handleGate(GateType type) {
+        this.type = type;
         root = new GateBuilder(type, fhe, observers);
 
         CircuitBuilder left = new CircuitBuilder(fhe, observers);
@@ -118,6 +123,13 @@ public class CircuitBuilder {
         public CircuitBuilder rightGate() {
             return right.gate();
         }
+    }
+
+    /**
+     *
+     */
+    interface DepthCounter {
+        void registerDepth(int depth);
     }
 
 }
