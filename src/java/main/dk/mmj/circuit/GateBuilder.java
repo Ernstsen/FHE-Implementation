@@ -34,13 +34,11 @@ class GateBuilder {
         if (inputGates.length > 0) {
             left = inputGates[0].gateBuild(dc);
             leftDepth = dc.depth;
-            System.out.printf("leftDepth: %d\n", leftDepth);
         }
 
         if (inputGates.length > 1) {
             right = inputGates[1].gateBuild(dc);
             rightDepth = dc.depth;
-            System.out.printf("rightDepth: %d\n", rightDepth);
         }
 
         if(leftDepth > rightDepth){
@@ -168,7 +166,7 @@ class GateBuilder {
 
 
 
-    class DepthCounterImpl implements CircuitBuilder.DepthCounter {
+    private static class DepthCounterImpl implements CircuitBuilder.DepthCounter {
         int depth = 0;
 
         public void registerDepth(int depth) {
