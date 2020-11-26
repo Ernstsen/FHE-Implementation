@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Matrix of BigIntegers
@@ -12,6 +13,7 @@ public class Matrix {
     private final int nrOfRows;
     private final int nrOfCols;
     private final BigInteger[][] inner;
+    private boolean concurrent = true;
 
 
     /**
@@ -136,7 +138,11 @@ public class Matrix {
         final BigInteger[][] result = new BigInteger[m][p];
 
         //Compute the resulting row, using a parallel stream to properly utilize multi-core CPU
-        IntStream.range(0, m).parallel().forEach(computeRowMultiplication(result, a, b, modulo));
+        IntStream range = IntStream.range(0, m);
+        if (concurrent) {
+            range = range.parallel();
+        }
+        range.forEach(computeRowMultiplication(result, a, b, modulo));
 
         return new Matrix(result);
     }
@@ -149,17 +155,22 @@ public class Matrix {
      * @return new matrix which is this * c
      */
     public Matrix multiply(BigInteger c, BigInteger modulo) {
-        int rows = getRows();
-        int columns = getColumns();
-        BigInteger[][] res = new BigInteger[rows][columns];
-
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < columns; col++) {
-                res[row][col] = get(row, col).multiply(c).mod(modulo);
-            }
+        Stream<BigInteger[]> stream = Arrays.stream(inner);
+        if (concurrent) {
+            stream = stream.parallel();
         }
 
+        BigInteger[][] res = stream.map(r -> rowMultiplyConstant(r, c, modulo)).toArray(BigInteger[][]::new);
+
         return new Matrix(res);
+    }
+
+    private BigInteger[] rowMultiplyConstant(BigInteger[] row, BigInteger c, BigInteger q) {
+        Stream<BigInteger> stream = Arrays.stream(row);
+        if (concurrent) {
+            stream = stream.parallel();
+        }
+        return stream.map(v -> v.multiply(c).mod(q)).toArray(BigInteger[]::new);
     }
 
     /**
@@ -204,17 +215,33 @@ public class Matrix {
                     " cannot be added to matrix with dimensions " + b.nrOfRows + "x" + b.nrOfCols);
         }
 
-        BigInteger[][] res = new BigInteger[a.nrOfRows][a.nrOfCols];
-
-        for (int row = 0; row < a.getRows(); row++) {
-            for (int column = 0; column < a.getColumns(); column++) {
-                BigInteger aVal = a.get(row, column);
-                BigInteger bVal = b.get(row, column);
-                res[row][column] = aVal.add(bVal).mod(modulo);
-            }
+        IntStream outerStream = IntStream.range(0, a.getRows());
+        if (concurrent) {
+            outerStream = outerStream.parallel();
         }
 
+        BigInteger[][] res = outerStream
+                .mapToObj(i -> rowAddition(a.getRow(i), b.getRow(i), modulo))
+                .toArray(BigInteger[][]::new);
+
         return new Matrix(res);
+    }
+
+    /**
+     * Computes entry-wise addition
+     *
+     * @param leftRow  left row to add
+     * @param rightRow right row to add
+     * @param q        modulus
+     * @return entrywise addition
+     */
+    private BigInteger[] rowAddition(BigInteger[] leftRow, BigInteger[] rightRow, BigInteger q) {
+        IntStream range = IntStream.range(0, leftRow.length);
+        if (concurrent) {
+            range = range.parallel();
+        }
+
+        return range.mapToObj(i -> leftRow[i].add(rightRow[i]).mod(q)).toArray(BigInteger[]::new);
     }
 
     /**
@@ -286,15 +313,23 @@ public class Matrix {
     }
 
     public Matrix negate(BigInteger q) {
-        BigInteger[][] res = new BigInteger[nrOfRows][nrOfCols];
-
-        for (int row = 0; row < nrOfRows; row++) {
-            for (int col = 0; col < nrOfCols; col++) {
-                res[row][col] = inner[row][col].negate().mod(q);
-            }
+        Stream<BigInteger[]> stream = Arrays.stream(inner);
+        if (concurrent) {
+            stream = stream.parallel();
         }
 
+        BigInteger[][] res = stream.map(r -> negateRow(r, q)).toArray(BigInteger[][]::new);
         return new Matrix(res);
+    }
+
+    private BigInteger[] negateRow(BigInteger[] row, BigInteger q) {
+        Stream<BigInteger> stream = Arrays.stream(row);
+        if (concurrent) {
+            stream = stream.parallel();
+        }
+        return stream.map(BigInteger::negate)
+                .map(i -> i.mod(q))
+                .toArray(BigInteger[]::new);
     }
 
     public Matrix transpose() {
@@ -307,6 +342,15 @@ public class Matrix {
         }
 
         return new Matrix(res);
+    }
+
+    /**
+     * Disables concurrency for this matrix object, and this object only
+     * <br/>
+     * Concurrency will not be disabled for new instances returned from methods on this.
+     */
+    public void disableConcurrency() {
+        concurrent = false;
     }
 
     @Override
