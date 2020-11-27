@@ -8,6 +8,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 public class MatrixPerformanceBenchmarks {
@@ -16,8 +17,9 @@ public class MatrixPerformanceBenchmarks {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @Fork(value = 1, warmups = 2)
-    @Measurement(iterations = 1, batchSize = 5)
+    @Fork(value = 1, warmups = 1)
+    @Measurement(iterations = 1, batchSize = 20)
+    @Timeout(time = 10)
     @Warmup(iterations = 1)
     public void addition(Blackhole blackhole, MatrixBenchmarkState state) {
         state.a.disableConcurrency();
@@ -27,8 +29,9 @@ public class MatrixPerformanceBenchmarks {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @Fork(value = 1, warmups = 2)
-    @Measurement(iterations = 1, batchSize = 5)
+    @Fork(value = 1, warmups = 1)
+    @Measurement(iterations = 1, batchSize = 20)
+    @Timeout(time = 10)
     @Warmup(iterations = 1)
     public void additionConcurrent(Blackhole blackhole, MatrixBenchmarkState state) {
         Matrix add = state.a.add(state.a, q);
@@ -37,8 +40,9 @@ public class MatrixPerformanceBenchmarks {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @Fork(value = 1, warmups = 2)
-    @Measurement(iterations = 1, batchSize = 5)
+    @Fork(value = 1, warmups = 1)
+    @Measurement(iterations = 1, batchSize = 20, time=5, timeUnit = TimeUnit.MINUTES)
+    @Timeout(time = 20)
     @Warmup(iterations = 1)
     public void multiplication(Blackhole blackhole, MatrixBenchmarkState state) {
         state.a.disableConcurrency();
@@ -48,8 +52,9 @@ public class MatrixPerformanceBenchmarks {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @Fork(value = 1, warmups = 2)
-    @Measurement(iterations = 1, batchSize = 5)
+    @Fork(value = 1, warmups = 1)
+    @Measurement(iterations = 1, batchSize = 20, time=5, timeUnit = TimeUnit.MINUTES)
+    @Timeout(time = 20)
     @Warmup(iterations = 1)
     public void multiplicationConcurrent(Blackhole blackhole, MatrixBenchmarkState state) {
         Matrix multiply = state.a.multiply(state.b, q);
@@ -58,8 +63,9 @@ public class MatrixPerformanceBenchmarks {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @Fork(value = 1, warmups = 2)
-    @Measurement(iterations = 1, batchSize = 5)
+    @Fork(value = 1, warmups = 1)
+    @Measurement(iterations = 1, batchSize = 20)
+    @Timeout(time = 10)
     @Warmup(iterations = 1)
     public void multiplicationWithConstant(Blackhole blackhole, MatrixBenchmarkState state) {
         state.a.disableConcurrency();
@@ -69,8 +75,9 @@ public class MatrixPerformanceBenchmarks {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @Fork(value = 1, warmups = 2)
-    @Measurement(iterations = 1, batchSize = 5)
+    @Fork(value = 1, warmups = 1)
+    @Measurement(iterations = 1, batchSize = 20)
+    @Timeout(time = 10)
     @Warmup(iterations = 1)
     public void multiplicationConcurrentWithConstant(Blackhole blackhole, MatrixBenchmarkState state) {
         Matrix multiply = state.a.multiply(c, q);
@@ -80,8 +87,9 @@ public class MatrixPerformanceBenchmarks {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @Fork(value = 1, warmups = 2)
-    @Measurement(iterations = 1, batchSize = 5)
+    @Fork(value = 1, warmups = 1)
+    @Measurement(iterations = 1, batchSize = 20)
+    @Timeout(time = 10)
     @Warmup(iterations = 1)
     public void negation(Blackhole blackhole, MatrixBenchmarkState state) {
         state.a.disableConcurrency();
@@ -91,8 +99,9 @@ public class MatrixPerformanceBenchmarks {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @Fork(value = 1, warmups = 2)
-    @Measurement(iterations = 1, batchSize = 5)
+    @Fork(value = 1, warmups = 1)
+    @Measurement(iterations = 1, batchSize = 20)
+    @Timeout(time = 20)
     @Warmup(iterations = 1)
     public void negationConcurrent(Blackhole blackhole, MatrixBenchmarkState state) {
         Matrix neg = state.a.negate(q);
@@ -102,9 +111,9 @@ public class MatrixPerformanceBenchmarks {
     @State(Scope.Benchmark)
     public static class MatrixBenchmarkState {
         private final Random secureRandom = new SecureRandom();
-        @Param({"64", "128", "256", "512", "1024", "2048"})
+        @Param({"64", "96", "128", "192", "256", "512", "1024"})
         public int n;
-        @Param({"64", "128", "256", "512", "1024", "2048"})
+        @Param({"64", "96", "128", "192", "256", "512", "1024"})
         public int m;
 
         public Matrix a;
