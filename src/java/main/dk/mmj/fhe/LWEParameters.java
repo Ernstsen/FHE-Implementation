@@ -4,10 +4,10 @@ import dk.mmj.fhe.interfaces.FHE;
 
 public class LWEParameters implements FHE.Parameters {
 
-    private int n = 3;
+    private int n = 5;
     private int m = n;
-    private int q = 1000003;
-    private double alpha = 0.0000024;
+    private int q = 2<<20;
+    private double alpha = 0.000001;
 
     public LWEParameters() {
     }

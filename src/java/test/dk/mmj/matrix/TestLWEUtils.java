@@ -20,7 +20,7 @@ public class TestLWEUtils {
     @Test
     public void createG() {
         int n = 5;
-        int q = 50;
+        int q = 2<<5;
 
         Matrix g = LWEUtils.createG(n, valueOf(q));
 

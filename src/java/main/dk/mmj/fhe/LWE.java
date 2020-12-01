@@ -10,8 +10,10 @@ import dk.mmj.matrix.Matrix;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static dk.mmj.matrix.LWEUtils.logQ;
 import static java.math.BigInteger.*;
 
 /**
@@ -34,7 +36,7 @@ public class LWE implements FHE<LWEParameters> {
 
         double v = gaussian * (alpha * qInt);
 
-        long vRounded = v> 0 ? ((long) (v + .5d)) : ((long) (v - .5d));
+        long vRounded = v > 0 ? ((long) (v + .5d)) : ((long) (v - .5d));
         return BigInteger.valueOf(vRounded).mod(q);
     }
 
@@ -110,11 +112,40 @@ public class LWE implements FHE<LWEParameters> {
         final Matrix bigG = LWEUtils.createG(s.getColumns(), q);
         final Matrix sG = s.multiply(bigG, q);
 
-        long trueVotes = IntStream.range(0, sC.getColumns()).parallel()
-                .mapToObj(i -> LWEUtils.readBit(sC, sG, q, i))
-                .filter(Boolean.TRUE::equals).count();
+        BigInteger trueNoise = calculateNoiseFromAssumption(sC, sG, true, q);
+        BigInteger falseNoise = calculateNoiseFromAssumption(sC, sG, false, q);
 
-        return trueVotes > (sC.getColumns() / 2);
+        return falseNoise.compareTo(trueNoise) >= 0;
+    }
+
+    /**
+     * Calculates the noise in the ciphertext, based on the assumption that C = ENC(assumption)
+     *
+     * @param sC secret key * ciphertext
+     * @param sG secret key * G
+     * @param assumption assumed encrypted value
+     * @param q modulus
+     * @return the average noise
+     */
+    private BigInteger calculateNoiseFromAssumption(Matrix sC, Matrix sG, boolean assumption, BigInteger q){
+        int logQ = logQ(q);
+
+        Matrix xsG = sG.multiply(assumption ? ONE : ZERO, q);
+
+        Optional<BigInteger> reduce = IntStream.range(0, sC.getColumns()).parallel()
+                .filter(i -> i % (logQ) == 0)//Only read one for each g in G
+                .map(i -> i + logQ - 1)//read the index corresponding to the most significant bit
+                .mapToObj(idx -> {//Calculates noise on index 'idx'
+                    BigInteger leftBitValue = sC.get(0, idx);
+                    BigInteger zeroHBitValue = xsG.get(0, idx);
+
+                    return leftBitValue.subtract(zeroHBitValue).mod(q).min(
+                            zeroHBitValue.subtract(leftBitValue).mod(q)
+                    );
+                })
+                .reduce(BigInteger::add);
+
+        return reduce.map(bigInteger -> bigInteger.divide(valueOf(logQ))).orElse(null);
     }
 
     @Override
@@ -154,10 +185,13 @@ public class LWE implements FHE<LWEParameters> {
 
     @Override
     public Ciphertext xor(Ciphertext c1, Ciphertext c2, PublicKey pk) {
-        Ciphertext left = not(and(c1, c2, pk), pk);
-        Ciphertext right = or(c1, c2, pk);
+//        Ciphertext left = not(and(c1, c2, pk), pk);
+//        Ciphertext right = or(c1, c2, pk);
+//
+//        return and(left, right, pk);
 
-        return and(left, right, pk);
+        return new LWECiphertext(assertOwnCiphertext(c1).getC()
+                .add(assertOwnCiphertext(c2).getC(), assertOwnKey(pk).getQ()));
     }
 
     private LWEPublicKey assertOwnKey(PublicKey pk) {

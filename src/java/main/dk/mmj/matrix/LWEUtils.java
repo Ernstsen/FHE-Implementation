@@ -9,13 +9,23 @@ import static java.math.BigInteger.*;
 @SuppressWarnings("UnnecessaryLocalVariable")//Readability is important
 public class LWEUtils {
 
+    /**
+     * Calculates logQ of a BigInteger q, which is a power of 2.
+     *
+     * @param q the q
+     * @return Number of bits needed to represent numbers in the ring Z_q
+     */
+    public static int logQ(BigInteger q) {
+        return q.bitLength() - 1;
+    }
+
 
     /**
      * Creates the matrix G for use in LWE encryption
      */
     public static Matrix createG(int n, BigInteger q) {
         int rows = n;
-        int ceilLogQ = q.bitLength();
+        int ceilLogQ = logQ(q);
         int columns = n * ceilLogQ;
         BigInteger[][] inner = new BigInteger[rows][columns];
 
@@ -74,7 +84,7 @@ public class LWEUtils {
      */
     public static Matrix calculateGInverse(Matrix m, BigInteger q) {
         Matrix mTrans = m.transpose();
-        int ceilLogQ = q.bitLength();
+        int ceilLogQ = logQ(q);
 
         BigInteger[][] inner = new BigInteger[mTrans.getRows()][mTrans.getColumns() * ceilLogQ];
         for (int row = 0; row < mTrans.getRows(); row++) {
@@ -107,7 +117,9 @@ public class LWEUtils {
      * @param modulus   modulus used in cryptosystem
      * @param bitNumber 0-indexed bit-number to be extracted
      * @return whether the decrypted bit is true or false
+     * @deprecated Old decryption method - kept for possibility of reverting
      */
+    @Deprecated
     public static boolean readBit(Matrix sc, Matrix sg,
                                   BigInteger modulus, int bitNumber) {
         final BigInteger leftBitValue = sc.get(0, bitNumber);

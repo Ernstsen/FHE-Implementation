@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static dk.mmj.matrix.LWEUtils.logQ;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
@@ -43,7 +44,11 @@ public class LWEBenchmarkUtils {
 
         LWEBenchmarkUtils util = new LWEBenchmarkUtils(xsG, q, sC);
 
-        Optional<BigInteger> reduce = IntStream.range(0, c.getColumns()).parallel()
+        int logQ = logQ(q);
+
+        Optional<BigInteger> reduce = IntStream.range(0, sC.getColumns()).parallel()
+                .filter(i -> i % (logQ) == 0)//Only read one for each g in G
+                .map(i -> i + logQ - 1)//read the index corresponding to the most significant bit
                 .mapToObj(util::calculateNoiseSingle)
                 .reduce(BigInteger::max);
 
