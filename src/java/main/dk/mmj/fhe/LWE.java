@@ -121,13 +121,13 @@ public class LWE implements FHE<LWEParameters> {
     /**
      * Calculates the noise in the ciphertext, based on the assumption that C = ENC(assumption)
      *
-     * @param sC secret key * ciphertext
-     * @param sG secret key * G
+     * @param sC         secret key * ciphertext
+     * @param sG         secret key * G
      * @param assumption assumed encrypted value
-     * @param q modulus
+     * @param q          modulus
      * @return the average noise
      */
-    private BigInteger calculateNoiseFromAssumption(Matrix sC, Matrix sG, boolean assumption, BigInteger q){
+    private BigInteger calculateNoiseFromAssumption(Matrix sC, Matrix sG, boolean assumption, BigInteger q) {
         int logQ = logQ(q);
 
         Matrix xsG = sG.multiply(assumption ? ONE : ZERO, q);
@@ -185,13 +185,10 @@ public class LWE implements FHE<LWEParameters> {
 
     @Override
     public Ciphertext xor(Ciphertext c1, Ciphertext c2, PublicKey pk) {
-//        Ciphertext left = not(and(c1, c2, pk), pk);
-//        Ciphertext right = or(c1, c2, pk);
-//
-//        return and(left, right, pk);
-
-        return new LWECiphertext(assertOwnCiphertext(c1).getC()
-                .add(assertOwnCiphertext(c2).getC(), assertOwnKey(pk).getQ()));
+        Matrix c1Matrix = assertOwnCiphertext(c1).getC();
+        Matrix c2Matrix = assertOwnCiphertext(c2).getC();
+        BigInteger q = assertOwnKey(pk).getQ();
+        return new LWECiphertext(c1Matrix.add(c2Matrix, q));
     }
 
     private LWEPublicKey assertOwnKey(PublicKey pk) {
