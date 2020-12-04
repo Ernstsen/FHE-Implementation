@@ -31,10 +31,13 @@ public class LWE implements FHE<LWEParameters> {
      * @return next gaussian random int with width = alpha*q
      */
     private BigInteger nextGaussian(BigInteger q) {
-        int qInt = q.intValue();
+        if(q.bitCount() > 63){
+            throw new UnsupportedOperationException("Unable to create gaussian distribution with q exceeding size of the Long datatype");
+        }
+
         double gaussian = rand.nextGaussian();
 
-        double v = gaussian * (alpha * qInt);
+        double v = gaussian * (alpha * q.longValue());
 
         long vRounded = v > 0 ? ((long) (v + .5d)) : ((long) (v - .5d));
         return BigInteger.valueOf(vRounded).mod(q);
@@ -56,7 +59,7 @@ public class LWE implements FHE<LWEParameters> {
      */
     public KeyPair generateKey(LWEParameters parameters) {
         this.alpha = parameters.getAlpha();
-        BigInteger q = BigInteger.valueOf(parameters.getQ());
+        BigInteger q = parameters.getQ();
         int n = parameters.getN();
         int m = parameters.getM();
 

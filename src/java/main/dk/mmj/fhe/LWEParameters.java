@@ -2,11 +2,13 @@ package dk.mmj.fhe;
 
 import dk.mmj.fhe.interfaces.FHE;
 
+import java.math.BigInteger;
+
 public class LWEParameters implements FHE.Parameters {
 
     private int n = 5;
     private int m = n;
-    private int q = 2<<20;
+    private BigInteger q = BigInteger.valueOf(1<<21);
     private double alpha = 0.000001;
 
     public LWEParameters() {
@@ -30,11 +32,11 @@ public class LWEParameters implements FHE.Parameters {
         return this;
     }
 
-    int getQ() {
+    BigInteger getQ() {
         return q;
     }
 
-    public LWEParameters setQ(int q) {
+    public LWEParameters setQ(BigInteger q) {
         this.q = q;
         return this;
     }
