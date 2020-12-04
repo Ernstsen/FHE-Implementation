@@ -8,6 +8,7 @@ import static java.math.BigInteger.*;
 
 @SuppressWarnings("UnnecessaryLocalVariable")//Readability is important
 public class LWEUtils {
+    private static Matrix lastCalculatedG = null;
 
     /**
      * Calculates logQ of a BigInteger q, which is a power of 2.
@@ -27,6 +28,11 @@ public class LWEUtils {
         int rows = n;
         int ceilLogQ = logQ(q);
         int columns = n * ceilLogQ;
+
+        if(lastCalculatedG != null && lastCalculatedG.getRows() == rows && lastCalculatedG.getColumns() == columns){
+            return lastCalculatedG;
+        }
+
         BigInteger[][] inner = new BigInteger[rows][columns];
 
         BigInteger[] g = calculateSmallG(ceilLogQ);
@@ -36,7 +42,7 @@ public class LWEUtils {
             System.arraycopy(g, 0, inner[row], row * g.length, g.length);
         }
 
-        return new Matrix(inner);
+        return lastCalculatedG = new Matrix(inner);
     }
 
 

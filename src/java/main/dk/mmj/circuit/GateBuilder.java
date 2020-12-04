@@ -41,7 +41,7 @@ class GateBuilder {
             rightDepth = dc.depth;
         }
 
-        if(leftDepth > rightDepth){
+        if(leftDepth > rightDepth && right != null){
             Gate tmp = left;
             left = right;
             right = tmp;

@@ -56,7 +56,7 @@ public class CircuitBuilder {
 
 
     public Circuit build() {
-        return root.build((i) -> System.out.printf("Circuit with depth: %d has been built", i))::evaluate;
+        return root.build((i) -> {})::evaluate;
     }
 
     private MultipleInputGateBuilder handleGate(GateType type) {
