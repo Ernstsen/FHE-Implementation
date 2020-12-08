@@ -11,12 +11,10 @@ import dk.mmj.fhe.LWESecretKey;
 import dk.mmj.fhe.interfaces.Ciphertext;
 import dk.mmj.fhe.interfaces.FHE;
 import dk.mmj.fhe.interfaces.PublicKey;
-import dk.mmj.fhe.interfaces.SecretKey;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.math.BigInteger.*;
@@ -38,7 +36,7 @@ public class SecurityParameterBenchmark {
         Circuit circuit = createBloodTypeCircuit(lwe);
         StringBuilder nArrayBuilder = new StringBuilder().append("X = [");
 
-        for (n = 1; n <= 512; n = n << 1) {
+        for (n = 1; n <= 64; n = n << 1) {
             nArrayBuilder.append(n).append(", ");
             for (qPower = 19; qPower < 32; qPower += 4) {
                 System.out.println("n:" + n + ", q: 2^" + qPower + "\r");
@@ -182,66 +180,6 @@ public class SecurityParameterBenchmark {
                     ", alpha=" + alpha +
                     ", noise='" + noise + '\'' +
                     '}';
-        }
-    }
-
-    private static class ObserverImpl implements CircuitBuilder.Observer {
-
-        private final LWE lwe;
-        private final List<String> logLines = new ArrayList<>();
-        private final LWESecretKey sk;
-
-        public ObserverImpl(SecretKey sk, LWE lwe) {
-            logLines.add("Type\tEvalNoise\tLeftInputNoise\tRightInputNoise\tComment\n");
-            this.sk = (LWESecretKey) sk;
-            this.lwe = lwe;
-        }
-
-        private void reset() {
-            logLines.clear();
-            logLines.add("Type\tEvalNoise\tLeftInputNoise\tRightInputNoise\tComment\n");
-        }
-
-        @Override
-        public void register(GateType type, Ciphertext inputValue, Ciphertext eval) {
-            StringBuilder sb = new StringBuilder()
-                    .append(type).append("\t");
-
-            boolean expectedEval = lwe.decrypt(eval, sk);
-            BigInteger evalNoise = LWEBenchmarkUtils.calculateNoise((LWECiphertext) eval, sk, expectedEval);
-            sb.append(evalNoise).append("\t");
-            boolean expectedInput = lwe.decrypt(inputValue, sk);
-            BigInteger inputNoise = LWEBenchmarkUtils.calculateNoise((LWECiphertext) inputValue, sk, expectedInput);
-            sb.append(inputNoise).append("\t");
-
-
-            logLines.add(sb.append("\n").toString());
-        }
-
-        @Override
-        public void register(GateType type, Ciphertext leftValue, Ciphertext rightValue, Ciphertext eval, String comment) {
-            StringBuilder sb = new StringBuilder()
-                    .append(type).append("\t");
-
-            boolean expectedEval = lwe.decrypt(eval, sk);
-            BigInteger evalNoise = LWEBenchmarkUtils.calculateNoise((LWECiphertext) eval, sk, expectedEval);
-            sb.append(evalNoise).append("\t");
-
-            boolean expectedLeft = lwe.decrypt(leftValue, sk);
-            BigInteger leftNoise = LWEBenchmarkUtils.calculateNoise((LWECiphertext) leftValue, sk, expectedLeft);
-            sb.append(leftNoise).append("\t");
-
-            boolean expectedRight = lwe.decrypt(rightValue, sk);
-            BigInteger rightNoise = LWEBenchmarkUtils.calculateNoise((LWECiphertext) rightValue, sk, expectedRight);
-            sb.append(rightNoise).append("\t");
-
-            sb.append(comment);
-            logLines.add(sb.append("\n").toString());
-
-        }
-
-        public List<String> getLogLines() {
-            return logLines;
         }
     }
 }
