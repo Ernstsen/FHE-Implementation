@@ -5,6 +5,7 @@ import dk.mmj.fhe.interfaces.FHE;
 import dk.mmj.fhe.interfaces.PublicKey;
 import dk.mmj.fhe.interfaces.SecretKey;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -43,6 +44,7 @@ public class TestLWECircuits {
         });
     }
 
+    @Ignore
     @Test
     public void testBloodTypes() {
         boolean[][] combinations = getBloodtypes();
