@@ -2,6 +2,7 @@ package dk.mmj.matrix;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -371,6 +372,13 @@ public class Matrix {
         }
 
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(nrOfRows, nrOfCols, concurrent);
+        result = 31 * result + Arrays.hashCode(inner);
+        return result;
     }
 
     @Override
